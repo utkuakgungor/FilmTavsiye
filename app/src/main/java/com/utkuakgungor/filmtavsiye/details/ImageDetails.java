@@ -1,0 +1,117 @@
+package com.utkuakgungor.filmtavsiye.details;
+
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
+import android.os.Bundle;
+import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.TextView;
+
+import com.github.chrisbanes.photoview.PhotoView;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.NetworkPolicy;
+import com.squareup.picasso.Picasso;
+import com.utkuakgungor.filmtavsiye.R;
+import com.utkuakgungor.filmtavsiye.utils.SaveImageHelper;
+
+import java.util.Objects;
+import java.util.UUID;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.res.ResourcesCompat;
+
+public class ImageDetails extends AppCompatActivity {
+
+    private CoordinatorLayout coordinatorLayout;
+    private static final int PERMISSION_REQUEST_CODE = 1000;
+    private String image;
+    private PhotoView photoView;
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            String filename = UUID.randomUUID().toString()+".jpg";
+            Picasso.get().load(image).into(new SaveImageHelper(
+                    getApplicationContext().getContentResolver(),
+                    filename,
+                    image));
+            Snackbar snackbar = Snackbar.make(coordinatorLayout,getResources().getString(R.string.resimindirme),Snackbar.LENGTH_LONG);
+            View view = snackbar.getView();
+            TextView snackbar_text = view.findViewById(com.google.android.material.R.id.snackbar_text);
+            view.setBackgroundColor(ContextCompat.getColor(ImageDetails.this,R.color.colorGray));
+            snackbar_text.setTextColor(ContextCompat.getColor(ImageDetails.this,R.color.colorBlack));
+            snackbar.show();
+        }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setTheme(R.style.AppThemeDarkNoActionBar);
+        setContentView(R.layout.activity_image);
+        FloatingActionButton back_fab=findViewById(R.id.detailimage_back_fab);
+        getImage();
+        photoView=findViewById(R.id.imagedetails_image);
+        FloatingActionButton fab = findViewById(R.id.detailimage_fab);
+        coordinatorLayout=findViewById(R.id.imagedetails_layout);
+        Picasso.get().load(image).networkPolicy(NetworkPolicy.OFFLINE).into(photoView, new Callback() {
+            @Override
+            public void onSuccess() {
+
+            }
+
+            @Override
+            public void onError(Exception e) {
+                Picasso.get().load(image).into(photoView);
+            }
+        });
+        Drawable myFabSrc = ResourcesCompat.getDrawable(getResources(),R.drawable.ic_arrow_white,Objects.requireNonNull(getTheme()));
+        assert myFabSrc != null;
+        Drawable willBeWhite = Objects.requireNonNull(myFabSrc.getConstantState()).newDrawable();
+        willBeWhite.mutate().setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
+        back_fab.setImageDrawable(willBeWhite);
+        back_fab.setOnClickListener(v -> onBackPressed());
+        fab.setOnClickListener(v -> {
+            if(ActivityCompat.checkSelfPermission(ImageDetails.this,Manifest.permission.WRITE_EXTERNAL_STORAGE)!=PackageManager.PERMISSION_GRANTED){
+                requestPermissions(new String[]{
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE
+                },PERMISSION_REQUEST_CODE);
+            }
+            else {
+                String filename = UUID.randomUUID().toString()+".jpg";
+                Picasso.get().load(image).into(new SaveImageHelper(
+                        getApplicationContext().getContentResolver(),
+                        filename,
+                        image));
+                Snackbar snackbar = Snackbar.make(coordinatorLayout,getResources().getString(R.string.resimindirme),Snackbar.LENGTH_LONG);
+                View view = snackbar.getView();
+                TextView snackbar_text = view.findViewById(com.google.android.material.R.id.snackbar_text);
+                view.setBackgroundColor(ContextCompat.getColor(ImageDetails.this,R.color.colorGray));
+                snackbar_text.setTextColor(ContextCompat.getColor(ImageDetails.this,R.color.colorBlack));
+                snackbar.show();
+            }
+        });
+
+        Window window = getWindow();
+        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        window.setStatusBarColor(getColor(R.color.colorBlack));
+    }
+
+    private void getImage(){
+        if(getIntent().hasExtra("image")){
+            image=getIntent().getStringExtra("image");
+        }
+    }
+}

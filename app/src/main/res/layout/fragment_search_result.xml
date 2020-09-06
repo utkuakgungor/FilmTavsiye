@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <androidx.appcompat.widget.Toolbar
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/toolbar"
+            android:layout_alignParentTop="true"
+            android:outlineProvider="bounds"
+            android:elevation="1dp"
+            app:contentInsetStart="0dp"
+            >
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:weightSum="2">
+                <ImageButton
+                    android:layout_width="50dp"
+                    android:src="@drawable/ic_card"
+                    android:layout_height="50dp"
+                    android:contentDescription="@string/card"
+                    android:background="@color/colorTransparent"
+                    android:id="@+id/btnCard"
+                    android:layout_weight="1"
+                    />
+                <ImageButton
+                    android:layout_weight="1"
+                    android:src="@drawable/ic_dashboard"
+                    android:id="@+id/btnDashboard"
+                    android:contentDescription="@string/dashboard"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:background="@color/colorTransparent"
+                    />
+            </LinearLayout>
+        </androidx.appcompat.widget.Toolbar>
+        <ImageView
+            android:contentDescription="@string/searchimage"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:id="@+id/sonucyok_resim"
+            android:layout_centerInParent="true"
+            android:visibility="gone"
+            android:src="@drawable/ic_search_sonuc"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:visibility="gone"
+            android:layout_height="wrap_content"
+            android:text="@string/sonucyok"
+            android:id="@+id/sonucyok_yazi"
+            android:layout_below="@id/sonucyok_resim"
+            android:layout_centerHorizontal="true"
+            android:textSize="20sp"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:layout_below="@id/toolbar"
+            android:id="@+id/firebaselist"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            />
+    </RelativeLayout>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+

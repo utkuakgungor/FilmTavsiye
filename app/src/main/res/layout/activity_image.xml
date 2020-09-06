@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorBlack"
+    android:id="@+id/imagedetails_layout">
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        android:id="@+id/detailimage_back_fab"
+        app:fabSize="normal"
+        android:src="@drawable/ic_arrow_white"
+        app:borderWidth="0dp"
+        app:backgroundTint="@color/colorBlack"/>
+    <com.github.chrisbanes.photoview.PhotoView
+        android:contentDescription="@string/movieimage"
+        android:id="@+id/imagedetails_image"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:transitionName="cardPicture"
+        />
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:layout_width="wrap_content"
+        android:contentDescription="@string/buttondownloadPicture"
+        android:layout_height="wrap_content"
+        app:fabSize="normal"
+        app:borderWidth="0dp"
+        app:backgroundTint="@color/colorBlack"
+        android:src="@drawable/ic_file_download"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="20dp"
+        android:id="@+id/detailimage_fab"
+        />
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

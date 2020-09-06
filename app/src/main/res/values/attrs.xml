@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="ds">
+        <attr name="iconcolor" format="color"/>
+        <attr name="dotcolor" format="color"/>
+        <attr name="dotactivecolor" format="color"/>
+        <attr name="fabbackgroundcolor" format="color"/>
+        <attr name="navigationactiveiconcolor" format="color"/>
+        <attr name="navigationiconcolor" format="color"/>
+        <attr name="navigationbackgroundcolor" format="color"/>
+        <attr name="chipbackgroundcolor" format="color"/>
+        <attr name="chipactivebackgroundcolor" format="color"/>
+        <attr name="actionbarcolor" format="color"/>
+        <attr name="toolbariconcolor" format="color"/>
+        <attr name="toolbaractiveiconcolor" format="color"/>
+        <attr name="normaldarkicon" format="reference"/>
+        <attr name="sinifcolor" format="color"/>
+        <attr name="fablikebuttoncolor" format="color"/>
+        <attr name="castbuttoncolor" format="color"/>
+        <attr name="castcardbackgroundcolor" format="color"/>
+        <attr name="turlertextcolor" format="color"/>
+        <attr name="searchsonucimagecolor" format="color"/>
+    </declare-styleable>
+</resources>
