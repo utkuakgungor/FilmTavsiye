@@ -2,3 +2,5 @@ google-services.json
 TMDBApi.java
 .DS_Store
 .idea
+app/release
+.gradle
