@@ -9,6 +9,12 @@ import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
+import org.json.JSONException;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -17,14 +23,14 @@ import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.viewpager.widget.ViewPager;
 import de.hdodenhof.circleimageview.CircleImageView;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import android.view.View;
-import android.widget.Button;
+import com.google.android.material.button.MaterialButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -44,24 +50,24 @@ import com.squareup.picasso.Callback;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 import com.utkuakgungor.filmtavsiye.R;
-import com.utkuakgungor.filmtavsiye.utils.CustomDialogClass;
-import com.utkuakgungor.filmtavsiye.utils.Favorites;
-import com.utkuakgungor.filmtavsiye.utils.Oyuncu;
-import com.utkuakgungor.filmtavsiye.utils.ViewPagerAdapter;
-import com.utkuakgungor.filmtavsiye.utils.Yonetmen;
+import com.utkuakgungor.filmtavsiye.utils.*;
 
+import java.util.List;
+import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Arrays;
 
 public class DetailsActivity extends AppCompatActivity {
 
-    private String ad,yil,puan,image,youtube,ozet,sure,ozet_eng,sure_eng,textcolor,oyuncular,tur,tur_eng,yonetmen,sinif,oyuncu1_resim,oyuncu2_resim,oyuncu3_resim,oyuncu4_resim,oyuncu5_resim,oyuncu6_resim,yonetmen_resim,resimler;
+    private Movie movie;
+    private RequestQueue requestQueue;
     private TextView oyuncuisim1,oyuncuisim2,oyuncuisim3,oyuncuisim4,oyuncuisim5,oyuncuisim6;
     private ImageView imageView;
     private CircleImageView image_yonetmen,oyuncuresim1,oyuncuresim2,oyuncuresim3,oyuncuresim4,oyuncuresim5,oyuncuresim6;
     private Favorites favorites;
     private FloatingActionButton fab;
-    private String[] oyuncu;
+    private List<String> oyuncuList,resimList,sinifList;
     private int dotscount;
     private ImageView[] dots;
     private int sayac=0;
@@ -71,15 +77,12 @@ public class DetailsActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        SharedPreferences sharedPreferences=getSharedPreferences("Ayarlar",MODE_PRIVATE);
-        if(sharedPreferences.contains("Gece")){
-            setTheme(R.style.AppThemeDarkNoActionBar);
-        }
-        else{
-            setTheme(R.style.AppThemeNoActionBar);
-        }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detay);
+        movie=new Movie();
+        oyuncuList= new ArrayList<>();
+        resimList= new ArrayList<>();
+        sinifList= new ArrayList<>();
         getIncomingIntent();
         final Pair[] pairs = new Pair[2];
         favorites=new Favorites(DetailsActivity.this);
@@ -100,6 +103,7 @@ public class DetailsActivity extends AppCompatActivity {
         toolbar.setNavigationIcon(R.drawable.ic_arrow_white);
         toolbar.setNavigationOnClickListener(v -> onBackPressed());
         ChipGroup chipGroup = findViewById(R.id.detaytur);
+        requestQueue= Volley.newRequestQueue(this);
         imageView=findViewById(R.id.detayImage);
         TextView textSure = findViewById(R.id.detaySureDegisken);
         final TextView textYonetmen = findViewById(R.id.detayyonetmen);
@@ -132,10 +136,11 @@ public class DetailsActivity extends AppCompatActivity {
         RelativeLayout oyuncu5_relative = findViewById(R.id.detayoyuncuRelative5);
         RelativeLayout oyuncu6_relative = findViewById(R.id.detayoyuncuRelative6);
         RelativeLayout yonetmen_relative = findViewById(R.id.detayyonetmenRelative);
-        Button diger = findViewById(R.id.detaydiger);
-        oyuncu=oyuncular.split(", ");
-        String[] resim = resimler.split(", ");
-        ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(DetailsActivity.this, resim);
+        MaterialButton diger = findViewById(R.id.detaydiger);
+        oyuncuList=Arrays.asList(movie.getFilm_oyuncular().split(", "));
+        resimList = Arrays.asList(movie.getFilm_resimler().split(", "));
+        sinifList = Arrays.asList(movie.getFilm_sinif().split(", "));
+        ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(DetailsActivity.this, resimList);
         viewPager.setAdapter(viewPagerAdapter);
         dotscount=viewPagerAdapter.getCount();
         dots=new ImageView[dotscount];
@@ -168,22 +173,20 @@ public class DetailsActivity extends AppCompatActivity {
 
             }
         });
-        String[] turler = tur.split(", ");
-        String[] turler_eng = tur_eng.split(", ");
+        String[] turler = movie.getFilm_tur().split(", ");
+        String[] turler_eng = movie.getFilm_tur_eng().split(", ");
 
         youTubePlayerView.addYouTubePlayerListener(new AbstractYouTubePlayerListener() {
             @Override
             public void onReady(@NonNull YouTubePlayer youTubePlayer) {
-                youTubePlayer.cueVideo(youtube,0);
+                youTubePlayer.cueVideo(movie.getYoutube(),0);
             }
         });
-
 
         for(sayac=0; sayac< turler.length; sayac++){
             if(Objects.equals(Locale.getDefault().getDisplayLanguage(),"Türkçe" )){
                 final Chip chip = new Chip(chipGroup.getContext());
                 chip.setText(turler[sayac]);
-                chip.setChipBackgroundColorResource(R.drawable.chipbackground);
                 chip.setTextSize(14);
                 chip.setOnClickListener(v -> {
                     Intent turactivity = new Intent(DetailsActivity.this, TurlerDetailsActivity.class);
@@ -196,7 +199,6 @@ public class DetailsActivity extends AppCompatActivity {
             else{
                 final Chip chip = new Chip(chipGroup.getContext());
                 chip.setText(turler_eng[sayac]);
-                chip.setChipBackgroundColorResource(R.drawable.chipbackground);
                 chip.setTextSize(14);
                 chip.setOnClickListener(v -> {
                     Intent turactivity = new Intent(DetailsActivity.this, TurlerDetailsActivity.class);
@@ -208,11 +210,11 @@ public class DetailsActivity extends AppCompatActivity {
             }
         }
 
-        if(!favorites.Kontrol(ad)){
+        if(!favorites.Kontrol(movie.getFilm_adi())){
             Drawable favFab = ResourcesCompat.getDrawable(getResources(),R.drawable.ic_favorite_ekli,getTheme());
             assert favFab != null;
             Drawable whiteFav = Objects.requireNonNull(favFab.getConstantState()).newDrawable();
-            whiteFav.mutate().setColorFilter(Color.RED, PorterDuff.Mode.SRC_ATOP);
+            whiteFav.mutate().setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_ATOP);
             fab.setImageDrawable(whiteFav);
         }
         else{
@@ -226,37 +228,37 @@ public class DetailsActivity extends AppCompatActivity {
         diger.setOnClickListener(v -> {
             CustomDialogClass customDialogClass = new CustomDialogClass();
             Bundle bundle= new Bundle();
-            bundle.putStringArray("oyuncular",oyuncu);
+            bundle.putStringArray("oyuncular",oyuncuList.toArray(new String[oyuncuList.size()]));
             customDialogClass.setArguments(bundle);
             customDialogClass.show(getSupportFragmentManager(),"Custom Dialog");
         });
 
         if(Objects.equals(Locale.getDefault().getDisplayLanguage(),"Türkçe" )){
-            textOzet.setText(ozet);
-            textSure.setText(sure);
+            textOzet.setText(movie.getOzet());
+            textSure.setText(movie.getSure());
         }
         else {
-            textSure.setText(sure_eng);
-            textOzet.setText(ozet_eng);
+            textSure.setText(movie.getFilm_sure_eng());
+            textOzet.setText(movie.getFilm_ozet_eng());
         }
-        if(Objects.equals(textcolor,"evet")){
+        if(Objects.equals(movie.getText_color(),"evet")){
             int color = Color.parseColor("#000000");
             textFilmAdi.setExpandedTitleColor(color);
         }
-        textYonetmen.setText(yonetmen);
-        textFilmAdi.setTitle(ad);
-        textFilmYili.setText(yil);
-        textPuan.setText(puan);
+        textYonetmen.setText(movie.getFilm_yonetmen());
+        textFilmAdi.setTitle(movie.getFilm_adi());
+        textFilmYili.setText(movie.getFilm_yili());
+        textPuan.setText(movie.getFilm_puani());
         imageView.setOnClickListener(v -> {
             Intent imageActivity = new Intent(DetailsActivity.this,ImageDetails.class);
-            imageActivity.putExtra("image",image);
+            imageActivity.putExtra("image",movie.getImage());
             Pair[] pair = new Pair[1];
             pair[0] = new Pair<View,String>(imageView,"cardPicture");
             ActivityOptions activityOptions=ActivityOptions
                     .makeSceneTransitionAnimation(DetailsActivity.this,pair);
             startActivity(imageActivity,activityOptions.toBundle());
         });
-        Picasso.get().load(image).networkPolicy(NetworkPolicy.OFFLINE).into(imageView, new Callback() {
+        Picasso.get().load(movie.getImage()).networkPolicy(NetworkPolicy.OFFLINE).into(imageView, new Callback() {
             @Override
             public void onSuccess() {
 
@@ -264,36 +266,22 @@ public class DetailsActivity extends AppCompatActivity {
 
             @Override
             public void onError(Exception e) {
-                Picasso.get().load(image).into(imageView);
+                Picasso.get().load(movie.getImage()).into(imageView);
             }
         });
 
         fab.setOnClickListener(v -> {
-            if (favorites.Kontrol(ad)){
-                favorites.ekle(ad,yil,puan,image,youtube,ozet,sure,ozet_eng,sure_eng,textcolor,oyuncular,tur,tur_eng,yonetmen,sinif,"");
-                snackbar = Snackbar.make(v,getResources().getString(R.string.favoriekle),Snackbar.LENGTH_LONG);
-                view=snackbar.getView();
-                snackbar_text =  view.findViewById(com.google.android.material.R.id.snackbar_text);
-                if(sharedPreferences.contains("Gece")){
-                    view.setBackgroundColor(ContextCompat.getColor(DetailsActivity.this,R.color.colorGray));
-                    snackbar_text.setTextColor(ContextCompat.getColor(DetailsActivity.this,R.color.colorBlack));
-                }
-                snackbar.show();
+            if (favorites.Kontrol(movie.getFilm_adi())){
+                favorites.ekle(movie);
+                Snackbar.make(v,getResources().getString(R.string.favoriekle),Snackbar.LENGTH_LONG).show();
                 Drawable myFabSrc = ResourcesCompat.getDrawable(getResources(),R.drawable.ic_favorite_ekli,getTheme());
                 assert myFabSrc != null;
                 Drawable willBeWhite = Objects.requireNonNull(myFabSrc.getConstantState()).newDrawable();
-                willBeWhite.mutate().setColorFilter(Color.RED, PorterDuff.Mode.SRC_ATOP);
+                willBeWhite.mutate().setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_ATOP);
                 fab.setImageDrawable(willBeWhite);
             }else {
-                favorites.deleteData(ad);
-                snackbar = Snackbar.make(v,getResources().getString(R.string.favoricikti),Snackbar.LENGTH_LONG);
-                view=snackbar.getView();
-                snackbar_text =  view.findViewById(com.google.android.material.R.id.snackbar_text);
-                if(sharedPreferences.contains("Gece")){
-                    view.setBackgroundColor(ContextCompat.getColor(DetailsActivity.this,R.color.colorGray));
-                    snackbar_text.setTextColor(ContextCompat.getColor(DetailsActivity.this,R.color.colorBlack));
-                }
-                snackbar.show();
+                favorites.deleteData(movie.getFilm_adi());
+                Snackbar.make(v,getResources().getString(R.string.favoricikti),Snackbar.LENGTH_LONG).show();
                 Drawable myFabSrc = ResourcesCompat.getDrawable(getResources(),R.drawable.ic_favorite_beyaz,getTheme());
                 assert myFabSrc != null;
                 Drawable willBeWhite = Objects.requireNonNull(myFabSrc.getConstantState()).newDrawable();
@@ -305,19 +293,8 @@ public class DetailsActivity extends AppCompatActivity {
         reference_yonetmen.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull final DataSnapshot dataSnapshot, @Nullable String s) {
-                if(Objects.equals(yonetmen,Objects.requireNonNull(dataSnapshot.getValue(Yonetmen.class)).getYonetmen_adi())){
-                    yonetmen_resim=Objects.requireNonNull(dataSnapshot.getValue(Yonetmen.class)).getYonetmen_resim_url();
-                    Picasso.get().load(Objects.requireNonNull(dataSnapshot.getValue(Yonetmen.class)).getYonetmen_resim_url()).into(image_yonetmen, new Callback() {
-                        @Override
-                        public void onSuccess() {
-
-                        }
-
-                        @Override
-                        public void onError(Exception e) {
-                            Picasso.get().load(Objects.requireNonNull(dataSnapshot.getValue(Yonetmen.class)).getYonetmen_resim_url()).into(image_yonetmen);
-                        }
-                    });
+                if(Objects.equals(movie.getFilm_yonetmen(),Objects.requireNonNull(dataSnapshot.getValue(Yonetmen.class)).getYonetmen_adi())){
+                    jsonTMDB(dataSnapshot.getValue(Yonetmen.class).getPerson_id(),image_yonetmen);
                 }
             }
 
@@ -346,98 +323,32 @@ public class DetailsActivity extends AppCompatActivity {
             @Override
             public void onChildAdded(@NonNull final DataSnapshot dataSnapshot, @Nullable String s) {
                 for(sayac=0;sayac<6;sayac++){
-                    if(Objects.equals(oyuncu[sayac],Objects.requireNonNull(dataSnapshot.getValue(Oyuncu.class)).getOyuncu_adi())){
+                    if(Objects.equals(oyuncuList.get(sayac),Objects.requireNonNull(dataSnapshot.getValue(Oyuncu.class)).getOyuncu_adi())){
                         if(Objects.equals(oyuncuisim1.getText(),getResources().getString(R.string.degisken))){
-                            oyuncuisim1.setText(oyuncu[sayac]);
-                            oyuncu1_resim=Objects.requireNonNull(dataSnapshot.getValue(Oyuncu.class)).getOyuncu_resim_url();
-                            Picasso.get().load(Objects.requireNonNull(dataSnapshot.getValue(Oyuncu.class)).getOyuncu_resim_url()).networkPolicy(NetworkPolicy.OFFLINE).into(oyuncuresim1, new Callback() {
-                                @Override
-                                public void onSuccess() {
-
-                                }
-
-                                @Override
-                                public void onError(Exception e) {
-                                    Picasso.get().load(Objects.requireNonNull(dataSnapshot.getValue(Oyuncu.class)).getOyuncu_resim_url()).into(oyuncuresim1);
-                                }
-                            });
+                            oyuncuisim1.setText(oyuncuList.get(sayac));
+                            jsonTMDB(dataSnapshot.getValue(Oyuncu.class).getPerson_id(),oyuncuresim1);
                         }
                         else if(Objects.equals(oyuncuisim2.getText(),getResources().getString(R.string.degisken))){
-                            oyuncuisim2.setText(oyuncu[sayac]);
-                            oyuncu2_resim=Objects.requireNonNull(dataSnapshot.getValue(Oyuncu.class)).getOyuncu_resim_url();
-                            Picasso.get().load(Objects.requireNonNull(dataSnapshot.getValue(Oyuncu.class)).getOyuncu_resim_url()).networkPolicy(NetworkPolicy.OFFLINE).into(oyuncuresim2, new Callback() {
-                                @Override
-                                public void onSuccess() {
-
-                                }
-
-                                @Override
-                                public void onError(Exception e) {
-                                    Picasso.get().load(Objects.requireNonNull(dataSnapshot.getValue(Oyuncu.class)).getOyuncu_resim_url()).into(oyuncuresim2);
-                                }
-                            });
+                            oyuncuisim2.setText(oyuncuList.get(sayac));
+                            jsonTMDB(dataSnapshot.getValue(Oyuncu.class).getPerson_id(),oyuncuresim2);
                         }
                         else if(Objects.equals(oyuncuisim3.getText(),getResources().getString(R.string.degisken))){
-                            oyuncuisim3.setText(oyuncu[sayac]);
-                            oyuncu3_resim=Objects.requireNonNull(dataSnapshot.getValue(Oyuncu.class)).getOyuncu_resim_url();
-                            Picasso.get().load(Objects.requireNonNull(dataSnapshot.getValue(Oyuncu.class)).getOyuncu_resim_url()).networkPolicy(NetworkPolicy.OFFLINE).into(oyuncuresim3, new Callback() {
-                                @Override
-                                public void onSuccess() {
-
-                                }
-
-                                @Override
-                                public void onError(Exception e) {
-                                    Picasso.get().load(Objects.requireNonNull(dataSnapshot.getValue(Oyuncu.class)).getOyuncu_resim_url()).into(oyuncuresim3);
-                                }
-                            });
+                            oyuncuisim3.setText(oyuncuList.get(sayac));
+                            jsonTMDB(dataSnapshot.getValue(Oyuncu.class).getPerson_id(),oyuncuresim3);
                         }
                         else if(Objects.equals(oyuncuisim4.getText(),getResources().getString(R.string.degisken))){
-                            oyuncuisim4.setText(oyuncu[sayac]);
-                            oyuncu4_resim=Objects.requireNonNull(dataSnapshot.getValue(Oyuncu.class)).getOyuncu_resim_url();
-                            Picasso.get().load(Objects.requireNonNull(dataSnapshot.getValue(Oyuncu.class)).getOyuncu_resim_url()).networkPolicy(NetworkPolicy.OFFLINE).into(oyuncuresim4, new Callback() {
-                                @Override
-                                public void onSuccess() {
-
-                                }
-
-                                @Override
-                                public void onError(Exception e) {
-                                    Picasso.get().load(Objects.requireNonNull(dataSnapshot.getValue(Oyuncu.class)).getOyuncu_resim_url()).into(oyuncuresim4);
-                                }
-                            });
+                            oyuncuisim4.setText(oyuncuList.get(sayac));
+                            jsonTMDB(dataSnapshot.getValue(Oyuncu.class).getPerson_id(),oyuncuresim4);
 
                         }
                         else if(Objects.equals(oyuncuisim5.getText(),getResources().getString(R.string.degisken))){
-                            oyuncuisim5.setText(oyuncu[sayac]);
-                            oyuncu5_resim=Objects.requireNonNull(dataSnapshot.getValue(Oyuncu.class)).getOyuncu_resim_url();
-                            Picasso.get().load(Objects.requireNonNull(dataSnapshot.getValue(Oyuncu.class)).getOyuncu_resim_url()).networkPolicy(NetworkPolicy.OFFLINE).into(oyuncuresim5, new Callback() {
-                                @Override
-                                public void onSuccess() {
-
-                                }
-
-                                @Override
-                                public void onError(Exception e) {
-                                    Picasso.get().load(Objects.requireNonNull(dataSnapshot.getValue(Oyuncu.class)).getOyuncu_resim_url()).into(oyuncuresim5);
-                                }
-                            });
+                            oyuncuisim5.setText(oyuncuList.get(sayac));
+                            jsonTMDB(dataSnapshot.getValue(Oyuncu.class).getPerson_id(),oyuncuresim5);
 
                         }
                         else if(Objects.equals(oyuncuisim6.getText(),getResources().getString(R.string.degisken))){
-                            oyuncuisim6.setText(oyuncu[sayac]);
-                            oyuncu6_resim=Objects.requireNonNull(dataSnapshot.getValue(Oyuncu.class)).getOyuncu_resim_url();
-                            Picasso.get().load(Objects.requireNonNull(dataSnapshot.getValue(Oyuncu.class)).getOyuncu_resim_url()).networkPolicy(NetworkPolicy.OFFLINE).into(oyuncuresim6, new Callback() {
-                                @Override
-                                public void onSuccess() {
-
-                                }
-
-                                @Override
-                                public void onError(Exception e) {
-                                    Picasso.get().load(Objects.requireNonNull(dataSnapshot.getValue(Oyuncu.class)).getOyuncu_resim_url()).into(oyuncuresim6);
-                                }
-                            });
+                            oyuncuisim6.setText(oyuncuList.get(sayac));
+                            jsonTMDB(dataSnapshot.getValue(Oyuncu.class).getPerson_id(),oyuncuresim6);
                         }
                     }
                 }
@@ -463,131 +374,73 @@ public class DetailsActivity extends AppCompatActivity {
 
             }
         });
-
-        sinif=sinif.replace(",","");
-        if(sinif.contains("Cinsellik")){
+        if(sinifList.contains("Cinsellik")){
             image_cinsellik.setVisibility(View.VISIBLE);
             image_cinsellik.setOnClickListener(v -> {
-                snackbar = Snackbar.make(v,getResources().getString(R.string.cinsellik),Snackbar.LENGTH_LONG);
-                view=snackbar.getView();
-                snackbar_text =  view.findViewById(com.google.android.material.R.id.snackbar_text);
-                if(sharedPreferences.contains("Gece")){
-                    view.setBackgroundColor(ContextCompat.getColor(DetailsActivity.this,R.color.colorGray));
-                    snackbar_text.setTextColor(ContextCompat.getColor(DetailsActivity.this,R.color.colorBlack));
-                }
-                snackbar.show();
+                Snackbar.make(v,getResources().getString(R.string.cinsellik),Snackbar.LENGTH_LONG).show();
             });
         }
         else{
             image_cinsellik.setVisibility(View.GONE);
         }
-        if(sinif.contains("Şiddet")){
+        if(sinifList.contains("Şiddet")){
             image_siddet.setVisibility(View.VISIBLE);
             image_siddet.setOnClickListener(v -> {
-                snackbar = Snackbar.make(v,getResources().getString(R.string.siddet),Snackbar.LENGTH_LONG);
-                view=snackbar.getView();
-                snackbar_text =  view.findViewById(com.google.android.material.R.id.snackbar_text);
-                if(sharedPreferences.contains("Gece")){
-                    view.setBackgroundColor(ContextCompat.getColor(DetailsActivity.this,R.color.colorGray));
-                    snackbar_text.setTextColor(ContextCompat.getColor(DetailsActivity.this,R.color.colorBlack));
-                }
-                snackbar.show();
+                Snackbar.make(v,getResources().getString(R.string.siddet),Snackbar.LENGTH_LONG).show();
             });
         }
         else{
             image_siddet.setVisibility(View.GONE);
         }
-        if(sinif.contains("Olumsuz")){
+        if(sinifList.contains("Olumsuz")){
             image_olumsuz.setVisibility(View.VISIBLE);
             image_olumsuz.setOnClickListener(v -> {
-                snackbar = Snackbar.make(v,getResources().getString(R.string.olmsuz),Snackbar.LENGTH_LONG);
-                view=snackbar.getView();
-                snackbar_text =  view.findViewById(com.google.android.material.R.id.snackbar_text);
-                if(sharedPreferences.contains("Gece")){
-                    view.setBackgroundColor(ContextCompat.getColor(DetailsActivity.this,R.color.colorGray));
-                    snackbar_text.setTextColor(ContextCompat.getColor(DetailsActivity.this,R.color.colorBlack));
-                }
-                snackbar.show();
+                Snackbar.make(v,getResources().getString(R.string.olmsuz),Snackbar.LENGTH_LONG).show();
             });
         }
         else{
             image_olumsuz.setVisibility(View.GONE);
         }
-        if(sinif.contains("Aile")){
+        if(sinifList.contains("Aile")){
             image_aile.setVisibility(View.VISIBLE);
             image_aile.setOnClickListener(v -> {
-                snackbar = Snackbar.make(v,getResources().getString(R.string.aile),Snackbar.LENGTH_LONG);
-                view=snackbar.getView();
-                snackbar_text =  view.findViewById(com.google.android.material.R.id.snackbar_text);
-                if(sharedPreferences.contains("Gece")){
-                    view.setBackgroundColor(ContextCompat.getColor(DetailsActivity.this,R.color.colorGray));
-                    snackbar_text.setTextColor(ContextCompat.getColor(DetailsActivity.this,R.color.colorBlack));
-                }
-                snackbar.show();
+                Snackbar.make(v,getResources().getString(R.string.aile),Snackbar.LENGTH_LONG).show();
             });
         }
         else{
             image_aile.setVisibility(View.GONE);
         }
-        if(sinif.contains("7")){
+        if(sinifList.contains("7")){
             image_7.setVisibility(View.VISIBLE);
             image_7.setOnClickListener(v -> {
-                snackbar = Snackbar.make(v,getResources().getString(R.string.yas7),Snackbar.LENGTH_LONG);
-                view=snackbar.getView();
-                snackbar_text =  view.findViewById(com.google.android.material.R.id.snackbar_text);
-                if(sharedPreferences.contains("Gece")){
-                    view.setBackgroundColor(ContextCompat.getColor(DetailsActivity.this,R.color.colorGray));
-                    snackbar_text.setTextColor(ContextCompat.getColor(DetailsActivity.this,R.color.colorBlack));
-                }
-                snackbar.show();
+                Snackbar.make(v,getResources().getString(R.string.yas7),Snackbar.LENGTH_LONG).show();
             });
         }
         else{
             image_7.setVisibility(View.GONE);
         }
-        if(sinif.contains("13")){
+        if(sinifList.contains("13")){
             image_13.setVisibility(View.VISIBLE);
             image_13.setOnClickListener(v -> {
-                snackbar = Snackbar.make(v,getResources().getString(R.string.yas13),Snackbar.LENGTH_LONG);
-                view=snackbar.getView();
-                snackbar_text =  view.findViewById(com.google.android.material.R.id.snackbar_text);
-                if(sharedPreferences.contains("Gece")){
-                    view.setBackgroundColor(ContextCompat.getColor(DetailsActivity.this,R.color.colorGray));
-                    snackbar_text.setTextColor(ContextCompat.getColor(DetailsActivity.this,R.color.colorBlack));
-                }
-                snackbar.show();
+                Snackbar.make(v,getResources().getString(R.string.yas13),Snackbar.LENGTH_LONG).show();
             });
         }
         else{
             image_13.setVisibility(View.GONE);
         }
-        if(sinif.contains("15")){
+        if(sinifList.contains("15")){
             image_15.setVisibility(View.VISIBLE);
             image_15.setOnClickListener(v ->{
-                snackbar = Snackbar.make(v,getResources().getString(R.string.yas15),Snackbar.LENGTH_LONG);
-                view=snackbar.getView();
-                snackbar_text =  view.findViewById(com.google.android.material.R.id.snackbar_text);
-                if(sharedPreferences.contains("Gece")){
-                    view.setBackgroundColor(ContextCompat.getColor(DetailsActivity.this,R.color.colorGray));
-                    snackbar_text.setTextColor(ContextCompat.getColor(DetailsActivity.this,R.color.colorBlack));
-                }
-                snackbar.show();
+                Snackbar.make(v,getResources().getString(R.string.yas15),Snackbar.LENGTH_LONG).show();
             });
         }
         else{
             image_15.setVisibility(View.GONE);
         }
-        if(sinif.contains("18")){
+        if(sinifList.contains("18")){
             image_18.setVisibility(View.VISIBLE);
             image_18.setOnClickListener(v -> {
-                snackbar = Snackbar.make(v,getResources().getString(R.string.yas18),Snackbar.LENGTH_LONG);
-                view=snackbar.getView();
-                snackbar_text =  view.findViewById(com.google.android.material.R.id.snackbar_text);
-                if(sharedPreferences.contains("Gece")){
-                    view.setBackgroundColor(ContextCompat.getColor(DetailsActivity.this,R.color.colorGray));
-                    snackbar_text.setTextColor(ContextCompat.getColor(DetailsActivity.this,R.color.colorBlack));
-                }
-                snackbar.show();
+                Snackbar.make(v,getResources().getString(R.string.yas18),Snackbar.LENGTH_LONG).show();
             });
         }
         else{
@@ -658,31 +511,55 @@ public class DetailsActivity extends AppCompatActivity {
         });
     }
 
+    private void jsonTMDB(String id,CircleImageView imageView){
+        String urlBasPerson = "https://api.themoviedb.org/3/person/";
+        String urlSonPerson = "?api_key="+ TMDBApi.getApiKey() +"&language=en-US";
+        JsonObjectRequest request=new JsonObjectRequest(Request.Method.GET, urlBasPerson + id + urlSonPerson, null,
+                response -> {
+                    try {
+                        if(Objects.equals(response.getString("profile_path"),"null") || Objects.equals(response.getString("profile_path"),"")){
+                            Picasso.get().load(R.drawable.ic_person).into(imageView);
+                        }
+                        else{
+                            Picasso.get().load("https://image.tmdb.org/t/p/original"+response.getString("profile_path")).networkPolicy(NetworkPolicy.OFFLINE).into(imageView, new Callback() {
+                                @Override
+                                public void onSuccess() {
+
+                                }
+
+                                @Override
+                                public void onError(Exception e) {
+                                    try {
+                                        Picasso.get().load("https://image.tmdb.org/t/p/original"+response.getString("profile_path")).into(imageView);
+                                    } catch (JSONException ex) {
+                                        ex.printStackTrace();
+                                    }
+                                }
+                            });
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }, Throwable::printStackTrace);
+        requestQueue.add(request);
+    }
+
     private void getIncomingIntent(){
-
-        if(getIntent().hasExtra("sure") && getIntent().hasExtra("ad") && getIntent().hasExtra("yil") && getIntent().hasExtra("puan")
-                && getIntent().hasExtra("image") && getIntent().hasExtra("youtube") && getIntent().hasExtra("ozet")
-                && getIntent().hasExtra("ozet_eng") && getIntent().hasExtra("sure_eng") && getIntent().hasExtra("color")
-                && getIntent().hasExtra("oyuncular") && getIntent().hasExtra("tur") && getIntent().hasExtra("yonetmen")
-                && getIntent().hasExtra("tur_eng") && getIntent().hasExtra("sinif") && getIntent().hasExtra("resimler")){
-
-            ad = getIntent().getStringExtra("ad");
-            yil=getIntent().getStringExtra("yil");
-            puan=getIntent().getStringExtra("puan");
-            image = getIntent().getStringExtra("image");
-            youtube = getIntent().getStringExtra("youtube");
-            ozet = getIntent().getStringExtra("ozet");
-            sure=getIntent().getStringExtra("sure");
-            ozet_eng=getIntent().getStringExtra("ozet_eng");
-            sure_eng=getIntent().getStringExtra("sure_eng");
-            textcolor=getIntent().getStringExtra("color");
-            oyuncular=getIntent().getStringExtra("oyuncular");
-            tur=getIntent().getStringExtra("tur");
-            tur_eng=getIntent().getStringExtra("tur_eng");
-            yonetmen=getIntent().getStringExtra("yonetmen");
-            sinif=getIntent().getStringExtra("sinif");
-            resimler=getIntent().getStringExtra("resimler");
-
-        }
+        movie.setFilm_adi(getIntent().getStringExtra("ad"));
+        movie.setFilm_yili(getIntent().getStringExtra("yil"));
+        movie.setFilm_puani(getIntent().getStringExtra("puan"));
+        movie.setImage(getIntent().getStringExtra("image"));
+        movie.setYoutube(getIntent().getStringExtra("youtube"));
+        movie.setOzet(getIntent().getStringExtra("ozet"));
+        movie.setSure(getIntent().getStringExtra("sure"));
+        movie.setFilm_ozet_eng(getIntent().getStringExtra("ozet_eng"));
+        movie.setFilm_sure_eng(getIntent().getStringExtra("sure_eng"));
+        movie.setText_color(getIntent().getStringExtra("color"));
+        movie.setFilm_oyuncular(getIntent().getStringExtra("oyuncular"));
+        movie.setFilm_tur(getIntent().getStringExtra("tur"));
+        movie.setFilm_tur_eng(getIntent().getStringExtra("tur_eng"));
+        movie.setFilm_yonetmen(getIntent().getStringExtra("yonetmen"));
+        movie.setFilm_sinif(getIntent().getStringExtra("sinif"));
+        movie.setFilm_resimler(getIntent().getStringExtra("resimler"));
     }
 }

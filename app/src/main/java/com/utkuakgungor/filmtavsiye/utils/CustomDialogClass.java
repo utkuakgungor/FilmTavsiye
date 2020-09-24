@@ -55,7 +55,7 @@ public class CustomDialogClass extends AppCompatDialogFragment {
         lim.setOrientation(RecyclerView.VERTICAL);
         recyclerView.setLayoutManager(lim);
         updateList();
-        adapter=new OyuncularAdapter(list);
+        adapter=new OyuncularAdapter(requireContext(),list);
         recyclerView.setAdapter(adapter);
         FloatingActionButton floatingActionButton = view.findViewById(R.id.castFab);
         floatingActionButton.setOnClickListener(v -> dismiss());

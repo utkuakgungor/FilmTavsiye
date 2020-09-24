@@ -77,28 +77,14 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.UserVi
             filmsinif=list.get(position).getFilm_sinif();
             filmresimler=list.get(position).getFilm_resimler();
             if (favorites.Kontrol(filmadi)){
-                favorites.ekle(filmadi,filmyili,filmpuani,filmfoto,filmyoutube,filmozeti,filmsure,filmozeteng,filmsureeng,textcolor,filmoyuncular,filmtur,filmtureng,filmyonetmen,filmsinif,filmresimler);
+                favorites.ekleModel(list.get(position));
                 favorites.close();
-                snackbar = Snackbar.make(v,v.getResources().getString(R.string.favoriekle),Snackbar.LENGTH_LONG);
-                view=snackbar.getView();
-                snackbar_text = (TextView) view.findViewById(com.google.android.material.R.id.snackbar_text);
-                if (sharedPreferences.contains("Gece")){
-                    view.setBackgroundColor(ContextCompat.getColor(context,R.color.colorGray));
-                    snackbar_text.setTextColor(ContextCompat.getColor(context,R.color.colorBlack));
-                }
-                snackbar.show();
+                Snackbar.make(v,v.getResources().getString(R.string.favoriekle),Snackbar.LENGTH_LONG).show();
                 holder.txt_fav.setImageResource(R.drawable.ic_favorite_ekli);
 
             }else {
                 favorites.deleteData(filmadi);
-                snackbar = Snackbar.make(v,v.getResources().getString(R.string.favoricikti),Snackbar.LENGTH_LONG);
-                view=snackbar.getView();
-                snackbar_text = (TextView) view.findViewById(com.google.android.material.R.id.snackbar_text);
-                if (sharedPreferences.contains("Gece")){
-                    view.setBackgroundColor(ContextCompat.getColor(context,R.color.colorGray));
-                    snackbar_text.setTextColor(ContextCompat.getColor(context,R.color.colorBlack));
-                }
-                snackbar.show();
+                Snackbar.make(v,v.getResources().getString(R.string.favoricikti),Snackbar.LENGTH_LONG).show();
                 list.remove(position);
                 notifyDataSetChanged();
 

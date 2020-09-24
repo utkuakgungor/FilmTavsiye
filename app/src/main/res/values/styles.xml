@@ -1,68 +1,12 @@
 <resources>
 
-    <!-- Day -->
-    <style name="AppTheme" parent="Theme.MaterialComponents.Light.DarkActionBar">
+    <style name="AppTheme" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
-        <item name="android:statusBarColor">@color/colorPrimary</item>
-        <item name="iconcolor">@color/colorBlack</item>
-        <item name="dotcolor">@color/colorBlack</item>
-        <item name="dotactivecolor">@color/colorPrimary</item>
-        <item name="fabbackgroundcolor">@color/colorWhite</item>
-        <item name="navigationiconcolor">@color/colorGray</item>
-        <item name="navigationactiveiconcolor">@color/colorPrimary</item>
-        <item name="navigationbackgroundcolor">@color/colorWhite</item>
-        <item name="actionbarcolor">@color/colorPrimary</item>
-        <item name="toolbaractiveiconcolor">@color/colorBlack</item>
-        <item name="toolbariconcolor">@color/colorGray</item>
-        <item name="normaldarkicon">@drawable/ic_night</item>
-        <item name="chipactivebackgroundcolor">@color/colorSilver</item>
-        <item name="chipbackgroundcolor">@color/colorLightGray</item>
-        <item name="sinifcolor">@color/colorBlack</item>
-        <item name="fablikebuttoncolor">@color/colorPrimary</item>
-        <item name="castbuttoncolor">@color/colorPrimary</item>
-        <item name="castcardbackgroundcolor">@color/colorWhite</item>
-        <item name="turlertextcolor">@color/colorWhite</item>
-        <item name="searchsonucimagecolor">@color/colorBlack</item>
     </style>
 
     <style name="AppThemeNoActionBar" parent="AppTheme">
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
-        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
-        <item name="android:statusBarColor">@color/colorTransparent</item>
-    </style>
-
-    <!-- Dark -->
-    <style name="AppThemeDark" parent="Theme.MaterialComponents">
-        <item name="colorPrimary">@color/colorDarkGray</item>
-        <item name="colorPrimaryDark">@color/colorBlack</item>
-        <item name="colorAccent">@color/colorSilver</item>
-        <item name="android:statusBarColor">@color/colorBlack</item>
-        <item name="android:navigationBarColor">@color/colorBlack</item>
-        <item name="iconcolor">@color/colorGray</item>
-        <item name="dotcolor">@color/colorSilver</item>
-        <item name="dotactivecolor">@color/colorWhite</item>
-        <item name="fabbackgroundcolor">@color/colorGray</item>
-        <item name="navigationiconcolor">@color/colorGray</item>
-        <item name="navigationactiveiconcolor">@color/colorWhite</item>
-        <item name="navigationbackgroundcolor">@color/colorDarkGray</item>
-        <item name="actionbarcolor">@color/colorDarkGray</item>
-        <item name="toolbaractiveiconcolor">@color/colorWhite</item>
-        <item name="toolbariconcolor">@color/colorGray</item>
-        <item name="normaldarkicon">@drawable/ic_day</item>
-        <item name="chipactivebackgroundcolor">@color/colorSilver</item>
-        <item name="chipbackgroundcolor">@color/colorGray</item>
-        <item name="sinifcolor">@color/colorSilver</item>
-        <item name="fablikebuttoncolor">@color/colorGray</item>
-        <item name="castbuttoncolor">@color/colorGray</item>
-        <item name="castcardbackgroundcolor">@color/colorGray2</item>
-        <item name="turlertextcolor">@color/colorSilver</item>
-        <item name="searchsonucimagecolor">@color/colorSilver</item>
-    </style>
-
-    <style name="AppThemeDarkNoActionBar" parent="AppThemeDark">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
@@ -75,6 +19,6 @@
         <item name="android:navigationBarColor">@color/colorTransparent</item>
     </style>
 
-    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.MaterialComponents.Dark.ActionBar"/>
 
 </resources>

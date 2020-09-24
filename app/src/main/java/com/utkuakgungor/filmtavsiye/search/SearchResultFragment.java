@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.google.firebase.database.ChildEventListener;
@@ -21,6 +22,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.utkuakgungor.filmtavsiye.R;
+import com.utkuakgungor.filmtavsiye.settings.SettingsActivity;
 import com.utkuakgungor.filmtavsiye.utils.FirebaseAdapter;
 import com.utkuakgungor.filmtavsiye.utils.Movie;
 
@@ -40,8 +42,7 @@ public class SearchResultFragment extends Fragment {
     private String adi,yonetmen,oyuncu,action,adventure,science,fantasy,thriller,drama,crime,mystery,western,war,comedy,history,firebase_oyuncu,firebase_turler;
     private List<Movie> result;
     private FirebaseAdapter adapter;
-    private ImageView sonucyok_resim;
-    private TextView sonucyok_text;
+    private RelativeLayout sonucyok_Relative;
     private Bundle bundle;
     private DatabaseReference reference;
 
@@ -57,25 +58,10 @@ public class SearchResultFragment extends Fragment {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        SharedPreferences sharedPreferences= Objects.requireNonNull(getActivity()).getSharedPreferences("Ayarlar", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor=sharedPreferences.edit();
-        if(sharedPreferences.contains("Gece")){
-            getActivity().setTheme(R.style.AppTheme);
-            editor.remove("Gece");
-            editor.commit();
-            Intent intent =getActivity().getIntent();
-            getActivity().finish();
-            getActivity().startActivity(intent);
-        }
-        else{
-            getActivity().setTheme(R.style.AppThemeDark);
-            editor.putString("Gece","Gece");
-            editor.commit();
-            Intent intent =getActivity().getIntent();
-            getActivity().finish();
-            getActivity().startActivity(intent);
-        }
-        return super.onOptionsItemSelected(item);
+        super.onOptionsItemSelected(item);
+        Intent privacyIntent = new Intent(getContext(), SettingsActivity.class);
+        startActivity(privacyIntent);
+        return true;
     }
 
     private void getData(){
@@ -100,12 +86,7 @@ public class SearchResultFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v =  inflater.inflate(R.layout.fragment_search_result, container, false);
         setHasOptionsMenu(true);
-        SharedPreferences sharedPreference= Objects.requireNonNull(getActivity()).getSharedPreferences("Ayarlar",Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor=sharedPreference.edit();
-        sonucyok_text=v.findViewById(R.id.sonucyok_yazi);
-        sonucyok_resim=v.findViewById(R.id.sonucyok_resim);
-        ImageButton btnCard =v.findViewById(R.id.btnCard);
-        ImageButton btnDashboard =v.findViewById(R.id.btnDashboard);
+        sonucyok_Relative=v.findViewById(R.id.aramasonucRelative);
         bundle=getArguments();
         getData();
         if(TextUtils.isEmpty(adi)){
@@ -159,38 +140,10 @@ public class SearchResultFragment extends Fragment {
         result =new ArrayList<>();
         RecyclerView recyclerView = v.findViewById(R.id.firebaselist);
         recyclerView.setHasFixedSize(true);
-        RecyclerView.LayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
         StaggeredGridLayoutManager staggeredGridLayoutManager=new StaggeredGridLayoutManager(2,1);
 
-        if(sharedPreference.contains("Card")){
-            recyclerView.setLayoutManager(linearLayoutManager);
-            btnCard.setImageResource(R.drawable.ic_card_active);
-            btnDashboard.setImageResource(R.drawable.ic_dashboard);
-        }
-        else {
-            recyclerView.setLayoutManager(staggeredGridLayoutManager);
-            btnCard.setImageResource(R.drawable.ic_card);
-            btnDashboard.setImageResource(R.drawable.ic_dashboard_active);
-        }
-
-        btnDashboard.setOnClickListener(v12 ->{
-            recyclerView.setLayoutManager(staggeredGridLayoutManager);
-            btnCard.setImageResource(R.drawable.ic_card);
-            btnDashboard.setImageResource(R.drawable.ic_dashboard_active);
-            editor.remove("Card");
-            editor.commit();
-        });
-
-        btnCard.setOnClickListener(v1 ->{
-            recyclerView.setLayoutManager(linearLayoutManager);
-            btnDashboard.setImageResource(R.drawable.ic_dashboard);
-            btnCard.setImageResource(R.drawable.ic_card_active);
-            editor.putString("Card","Card");
-            editor.commit();
-        });
-
         adapter =new FirebaseAdapter(getContext(),result);
-
+        recyclerView.setLayoutManager(staggeredGridLayoutManager);
         recyclerView.setAdapter(adapter);
 
         updateList(adi,yonetmen,oyuncu,action,adventure,science,fantasy,thriller,drama,crime,mystery,western,war,comedy,history);
@@ -227,12 +180,10 @@ public class SearchResultFragment extends Fragment {
                         && firebase_turler.contains(comedy)
                         && firebase_turler.contains(history)){
                     result.add(dataSnapshot.getValue(Movie.class));
-                    sonucyok_resim.setVisibility(View.GONE);
-                    sonucyok_text.setVisibility(View.GONE);
+                    sonucyok_Relative.setVisibility(View.GONE);
                 }
                 else if(result.isEmpty()) {
-                    sonucyok_text.setVisibility(View.VISIBLE);
-                    sonucyok_resim.setVisibility(View.VISIBLE);
+                    sonucyok_Relative.setVisibility(View.VISIBLE);
                 }
                 adapter.notifyDataSetChanged();
             }

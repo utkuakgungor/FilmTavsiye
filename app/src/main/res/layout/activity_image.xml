@@ -14,7 +14,7 @@
         android:layout_margin="20dp"
         android:id="@+id/detailimage_back_fab"
         app:fabSize="normal"
-        android:src="@drawable/ic_arrow_white"
+        app:srcCompat="@drawable/ic_arrow_white"
         app:borderWidth="0dp"
         app:backgroundTint="@color/colorBlack"/>
     <com.github.chrisbanes.photoview.PhotoView
@@ -31,7 +31,7 @@
         app:fabSize="normal"
         app:borderWidth="0dp"
         app:backgroundTint="@color/colorBlack"
-        android:src="@drawable/ic_file_download"
+        app:srcCompat="@drawable/ic_file_download"
         android:layout_gravity="bottom|end"
         android:layout_margin="20dp"
         android:id="@+id/detailimage_fab"

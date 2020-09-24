@@ -21,5 +21,5 @@
             android:layout_margin="15dp"
             android:src="@drawable/ic_back"
             app:fabSize="normal"
-            app:backgroundTint="?attr/fabbackgroundcolor" />
+            app:backgroundTint="@color/colorPrimary" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -40,25 +40,41 @@
             </intent-filter>
         </activity>
         <activity
+            android:theme="@style/AppThemeNoActionBar"
             android:name=".details.DetailsActivity"
             android:hardwareAccelerated="true"
             android:parentActivityName=".main.MainActivity"
             android:screenOrientation="portrait">
         </activity>
         <activity
+            android:theme="@style/AppThemeNoActionBar"
             android:name=".details.ImageDetails"
             android:hardwareAccelerated="true"
             android:screenOrientation="portrait"/>
         <activity
+            android:theme="@style/AppThemeNoActionBar"
             android:name=".details.TurlerDetailsActivity"
             android:hardwareAccelerated="true"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".privacy.PrivacyActivity"
+            android:theme="@style/AppThemeNoActionBar"
+            android:name=".settings.WebViewActivity"
             android:hardwareAccelerated="true"
             android:screenOrientation="portrait"/>
         <activity
             android:name=".details.OyuncuDetailsActivity"
+            android:hardwareAccelerated="true"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".settings.SettingsActivity"
+            android:hardwareAccelerated="true"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".settings.LoginActivity"
+            android:hardwareAccelerated="true"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".settings.RegisterActivity"
             android:hardwareAccelerated="true"
             android:screenOrientation="portrait"/>
     </application>

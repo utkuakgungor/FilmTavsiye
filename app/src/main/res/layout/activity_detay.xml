@@ -48,7 +48,7 @@
         android:layout_height="wrap_content"
         app:srcCompat="@drawable/ic_favorite_beyaz"
         app:fabSize="normal"
-        app:backgroundTint="?attr/fablikebuttoncolor"
+        app:backgroundTint="@color/colorPrimary"
         app:layout_anchor="@id/appbar"
         app:layout_anchorGravity="bottom|end"
         android:layout_marginEnd="15dp"
@@ -387,14 +387,13 @@
                             android:layout_toEndOf="@id/detayoyuncuresim6"
                             />
                     </RelativeLayout>
-                    <Button
+                    <com.google.android.material.button.MaterialButton
                         android:layout_centerHorizontal="true"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_below="@id/detayoyuncuRelative6"
                         android:layout_marginTop="14dp"
                         android:text="@string/more"
-                        android:backgroundTint="?attr/castbuttoncolor"
                         android:id="@+id/detaydiger"/>
                 </RelativeLayout>
                 <TextView

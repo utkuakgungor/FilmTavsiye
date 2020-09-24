@@ -2,15 +2,22 @@ package com.utkuakgungor.filmtavsiye.utils;
 
 public class Yonetmen {
 
-    private String yonetmen_adi,yonetmen_resim_url,person_id;
+    private String person_id;
+    private String yonetmen_adi;
 
     public Yonetmen(){
 
     }
 
-    public Yonetmen(String yonetmen_adi, String yonetmen_resim_url,String person_id){
-        this.yonetmen_adi=yonetmen_adi;
-        this.yonetmen_resim_url = yonetmen_resim_url;
+    public String getYonetmen_adi() {
+        return yonetmen_adi;
+    }
+
+    public void setYonetmen_adi(String yonetmen_adi) {
+        this.yonetmen_adi = yonetmen_adi;
+    }
+
+    public Yonetmen(String person_id){
         this.person_id=person_id;
     }
 
@@ -21,13 +28,4 @@ public class Yonetmen {
     public void setPerson_id(String person_id) {
         this.person_id = person_id;
     }
-
-    public String getYonetmen_adi() {
-        return yonetmen_adi;
-    }
-
-    public String getYonetmen_resim_url() {
-        return yonetmen_resim_url;
-    }
-
 }

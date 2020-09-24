@@ -88,32 +88,64 @@ public class Movie {
         return film_ozet_eng;
     }
 
+    public void setFilm_ozet_eng(String film_ozet_eng) {
+        this.film_ozet_eng = film_ozet_eng;
+    }
+
     public String getFilm_sure_eng() {
         return film_sure_eng;
+    }
+
+    public void setFilm_sure_eng(String film_sure_eng) {
+        this.film_sure_eng = film_sure_eng;
     }
 
     public String getText_color() {
         return text_color;
     }
 
+    public void setText_color(String text_color) {
+        this.text_color = text_color;
+    }
+
     public String getFilm_oyuncular() {
         return film_oyuncular;
+    }
+
+    public void setFilm_oyuncular(String film_oyuncular) {
+        this.film_oyuncular = film_oyuncular;
     }
 
     public String getFilm_tur() {
         return film_tur;
     }
 
+    public void setFilm_tur(String film_tur) {
+        this.film_tur = film_tur;
+    }
+
     public String getFilm_tur_eng() {
         return film_tur_eng;
+    }
+
+    public void setFilm_tur_eng(String film_tur_eng) {
+        this.film_tur_eng = film_tur_eng;
     }
 
     public String getFilm_yonetmen() {
         return film_yonetmen;
     }
 
+    public void setFilm_yonetmen(String film_yonetmen) {
+        this.film_yonetmen = film_yonetmen;
+    }
+
     public String getFilm_sinif() {
         return film_sinif;
+    }
+
+    public void setFilm_sinif(String film_sinif) {
+        this.film_sinif = film_sinif;
     }
 
     public String getFilm_resimler() {

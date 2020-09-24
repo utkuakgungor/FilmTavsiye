@@ -2,17 +2,13 @@ package com.utkuakgungor.filmtavsiye.details;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.MenuItem;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -51,14 +47,6 @@ public class TurlerDetailsActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        SharedPreferences sharedPreferences=getSharedPreferences("Ayarlar",MODE_PRIVATE);
-        SharedPreferences.Editor editor=sharedPreferences.edit();
-        if(sharedPreferences.contains("Gece")){
-            setTheme(R.style.AppThemeDarkNoActionBar);
-        }
-        else{
-            setTheme(R.style.AppThemeNoActionBar);
-        }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_turlerdetails);
         getIncomingIntent();
@@ -67,8 +55,6 @@ public class TurlerDetailsActivity extends AppCompatActivity {
         AppBarLayout appBarLayout=findViewById(R.id.appbar);
         toolbar.setNavigationIcon(R.drawable.ic_arrow_white);
         toolbar.setNavigationOnClickListener(v -> onBackPressed());
-        ImageButton btnCard=findViewById(R.id.btnCard);
-        ImageButton btnDashboard =findViewById(R.id.btnDashboard);
         TextView imageTextview = findViewById(R.id.ImageViewText);
         imageView=findViewById(R.id.detayImage);
         FirebaseDatabase database=FirebaseDatabase.getInstance();
@@ -77,9 +63,7 @@ public class TurlerDetailsActivity extends AppCompatActivity {
         result=new ArrayList<>();
         RecyclerView recyclerView=findViewById(R.id.firebaselist);
         recyclerView.setHasFixedSize(true);
-        LinearLayoutManager linearLayoutManager=new LinearLayoutManager(TurlerDetailsActivity.this);
         final StaggeredGridLayoutManager staggeredGridLayoutManager=new StaggeredGridLayoutManager(2,1);
-        recyclerView.setLayoutManager(linearLayoutManager);
 
         imageTextview.setText(tur);
         appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
@@ -100,35 +84,8 @@ public class TurlerDetailsActivity extends AppCompatActivity {
             }
         });
 
-        if(sharedPreferences.contains("Card")){
-            recyclerView.setLayoutManager(linearLayoutManager);
-            btnCard.setImageResource(R.drawable.ic_card_active);
-            btnDashboard.setImageResource(R.drawable.ic_dashboard);
-        }
-        else {
-            recyclerView.setLayoutManager(staggeredGridLayoutManager);
-            btnCard.setImageResource(R.drawable.ic_card);
-            btnDashboard.setImageResource(R.drawable.ic_dashboard_active);
-        }
-
-        btnDashboard.setOnClickListener(v12 ->{
-            recyclerView.setLayoutManager(staggeredGridLayoutManager);
-            btnCard.setImageResource(R.drawable.ic_card);
-            btnDashboard.setImageResource(R.drawable.ic_dashboard_active);
-            editor.remove("Card");
-            editor.commit();
-        });
-
-        btnCard.setOnClickListener(v1 ->{
-            recyclerView.setLayoutManager(linearLayoutManager);
-            btnDashboard.setImageResource(R.drawable.ic_dashboard);
-            btnCard.setImageResource(R.drawable.ic_card_active);
-            editor.putString("Card","Card");
-            editor.commit();
-        });
-
         Picasso.get().load(url).into(imageView);
-
+        recyclerView.setLayoutManager(staggeredGridLayoutManager);
         adapter=new FirebaseAdapter(TurlerDetailsActivity.this,result);
         recyclerView.setAdapter(adapter);
         updateList();

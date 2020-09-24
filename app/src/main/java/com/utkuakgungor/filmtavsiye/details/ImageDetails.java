@@ -45,12 +45,7 @@ public class ImageDetails extends AppCompatActivity {
                     getApplicationContext().getContentResolver(),
                     filename,
                     image));
-            Snackbar snackbar = Snackbar.make(coordinatorLayout,getResources().getString(R.string.resimindirme),Snackbar.LENGTH_LONG);
-            View view = snackbar.getView();
-            TextView snackbar_text = view.findViewById(com.google.android.material.R.id.snackbar_text);
-            view.setBackgroundColor(ContextCompat.getColor(ImageDetails.this,R.color.colorGray));
-            snackbar_text.setTextColor(ContextCompat.getColor(ImageDetails.this,R.color.colorBlack));
-            snackbar.show();
+            Snackbar.make(coordinatorLayout,getResources().getString(R.string.resimindirme),Snackbar.LENGTH_LONG).show();
         }
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
@@ -58,7 +53,6 @@ public class ImageDetails extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setTheme(R.style.AppThemeDarkNoActionBar);
         setContentView(R.layout.activity_image);
         FloatingActionButton back_fab=findViewById(R.id.detailimage_back_fab);
         getImage();
@@ -94,12 +88,7 @@ public class ImageDetails extends AppCompatActivity {
                         getApplicationContext().getContentResolver(),
                         filename,
                         image));
-                Snackbar snackbar = Snackbar.make(coordinatorLayout,getResources().getString(R.string.resimindirme),Snackbar.LENGTH_LONG);
-                View view = snackbar.getView();
-                TextView snackbar_text = view.findViewById(com.google.android.material.R.id.snackbar_text);
-                view.setBackgroundColor(ContextCompat.getColor(ImageDetails.this,R.color.colorGray));
-                snackbar_text.setTextColor(ContextCompat.getColor(ImageDetails.this,R.color.colorBlack));
-                snackbar.show();
+                Snackbar.make(coordinatorLayout,getResources().getString(R.string.resimindirme),Snackbar.LENGTH_LONG).show();
             }
         });
 

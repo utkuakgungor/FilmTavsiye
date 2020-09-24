@@ -24,6 +24,7 @@ import com.google.android.material.chip.Chip;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.utkuakgungor.filmtavsiye.R;
+import com.utkuakgungor.filmtavsiye.settings.SettingsActivity;
 
 import java.util.Objects;
 
@@ -47,25 +48,10 @@ public class SearchFragment extends Fragment {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        sharedPreferences= Objects.requireNonNull(getActivity()).getSharedPreferences("Ayarlar", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor=sharedPreferences.edit();
-        if(sharedPreferences.contains("Gece")){
-            getActivity().setTheme(R.style.AppTheme);
-            editor.remove("Gece");
-            editor.commit();
-            Intent intent =getActivity().getIntent();
-            getActivity().finish();
-            getActivity().startActivity(intent);
-        }
-        else{
-            getActivity().setTheme(R.style.AppThemeDark);
-            editor.putString("Gece","Gece");
-            editor.commit();
-            Intent intent =getActivity().getIntent();
-            getActivity().finish();
-            getActivity().startActivity(intent);
-        }
-        return super.onOptionsItemSelected(item);
+        super.onOptionsItemSelected(item);
+        Intent privacyIntent = new Intent(getContext(), SettingsActivity.class);
+        startActivity(privacyIntent);
+        return true;
     }
 
     @Override
@@ -201,14 +187,7 @@ public class SearchFragment extends Fragment {
                     .addToBackStack(null).commit();
         }
         else{
-            Snackbar snackbar = Snackbar.make(Objects.requireNonNull(getView()),getResources().getString(R.string.degergir),Snackbar.LENGTH_LONG);
-            View view = snackbar.getView();
-            TextView snackbar_text = (TextView) view.findViewById(com.google.android.material.R.id.snackbar_text);
-            if(sharedPreferences.contains("Gece")){
-                view.setBackgroundColor(ContextCompat.getColor(Objects.requireNonNull(getActivity()),R.color.colorGray));
-                snackbar_text.setTextColor(ContextCompat.getColor(getActivity(),R.color.colorBlack));
-            }
-            snackbar.show();
+            Snackbar.make(Objects.requireNonNull(getView()),getResources().getString(R.string.degergir),Snackbar.LENGTH_LONG).show();
         }
     }
 

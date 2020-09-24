@@ -2,14 +2,22 @@ package com.utkuakgungor.filmtavsiye.utils;
 
 public class Oyuncu {
 
-    private String oyuncu_adi,oyuncu_resim_url,person_id;
+    private String person_id;
+    private String oyuncu_adi;
 
     public Oyuncu(){
 
     }
-    public Oyuncu(String oyuncu_adi,String oyuncu_resim_url,String person_id){
-        this.oyuncu_adi=oyuncu_adi;
-        this.oyuncu_resim_url=oyuncu_resim_url;
+
+    public String getOyuncu_adi() {
+        return oyuncu_adi;
+    }
+
+    public void setOyuncu_adi(String oyuncu_adi) {
+        this.oyuncu_adi = oyuncu_adi;
+    }
+
+    public Oyuncu(String person_id){
         this.person_id=person_id;
     }
 
@@ -20,13 +28,4 @@ public class Oyuncu {
     public void setPerson_id(String person_id) {
         this.person_id = person_id;
     }
-
-    public String getOyuncu_adi() {
-        return oyuncu_adi;
-    }
-
-    public String getOyuncu_resim_url() {
-        return oyuncu_resim_url;
-    }
-
 }

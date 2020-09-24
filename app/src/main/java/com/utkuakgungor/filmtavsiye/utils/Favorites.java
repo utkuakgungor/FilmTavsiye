@@ -65,27 +65,25 @@ public class Favorites extends SQLiteOpenHelper {
         db.execSQL(CREATE_TABLE);
     }
 
-    public void ekle(String film_adi, String film_yili,String film_puan,String film_image,String film_youtube,
-                     String film_ozet,String film_sure,String film_ozet_eng,String film_sure_eng,String text_color,
-                     String film_oyuncular,String film_tur,String film_tur_eng,String film_yonetmen,String film_sinif,String film_resimler) {
+    public void ekle(Movie movie) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
-        values.put(FILM_ADI, film_adi);
-        values.put(FILM_YILI, film_yili);
-        values.put(FILM_PUAN, film_puan);
-        values.put(FILM_IMAGE, film_image);
-        values.put(FILM_YOUTUBE,film_youtube);
-        values.put(FILM_OZET,film_ozet);
-        values.put(FILM_SURE,film_sure);
-        values.put(FILM_OZET_ENG,film_ozet_eng);
-        values.put(FILM_SURE_ENG,film_sure_eng);
-        values.put(TEXT_COLOR,text_color);
-        values.put(FILM_OYUNCULAR,film_oyuncular);
-        values.put(FILM_TUR,film_tur);
-        values.put(FILM_TUR_ENG,film_tur_eng);
-        values.put(FILM_YONETMEN,film_yonetmen);
-        values.put(FILM_SINIF,film_sinif);
-        values.put(FILM_RESIMLER,film_resimler);
+        values.put(FILM_ADI, movie.getFilm_adi());
+        values.put(FILM_YILI, movie.getFilm_yili());
+        values.put(FILM_PUAN, movie.getFilm_puani());
+        values.put(FILM_IMAGE, movie.getImage());
+        values.put(FILM_YOUTUBE,movie.getYoutube());
+        values.put(FILM_OZET,movie.getOzet());
+        values.put(FILM_SURE,movie.getSure());
+        values.put(FILM_OZET_ENG,movie.getFilm_ozet_eng());
+        values.put(FILM_SURE_ENG,movie.getFilm_sure_eng());
+        values.put(TEXT_COLOR,movie.getText_color());
+        values.put(FILM_OYUNCULAR,movie.getFilm_oyuncular());
+        values.put(FILM_TUR,movie.getFilm_tur());
+        values.put(FILM_TUR_ENG,movie.getFilm_tur_eng());
+        values.put(FILM_YONETMEN,movie.getFilm_yonetmen());
+        values.put(FILM_SINIF,movie.getFilm_sinif());
+        values.put(FILM_RESIMLER,movie.getFilm_resimler());
 
         db.insert(TABLE_NAME, null, values);
         db.close();
@@ -148,5 +146,29 @@ public class Favorites extends SQLiteOpenHelper {
         if(arg1<3){
             db.execSQL("ALTER TABLE "+TABLE_NAME+" ADD COLUMN "+FILM_RESIMLER+" TEXT;");
         }
+    }
+
+    public void ekleModel(Model model) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(FILM_ADI, model.getFilm_adi());
+        values.put(FILM_YILI, model.getFilm_yili());
+        values.put(FILM_PUAN, model.getFilm_puani());
+        values.put(FILM_IMAGE, model.getImage());
+        values.put(FILM_YOUTUBE,model.getYoutube());
+        values.put(FILM_OZET,model.getOzet());
+        values.put(FILM_SURE,model.getSure());
+        values.put(FILM_OZET_ENG,model.getFilm_ozet_eng());
+        values.put(FILM_SURE_ENG,model.getFilm_sure_eng());
+        values.put(TEXT_COLOR,model.getText_color());
+        values.put(FILM_OYUNCULAR,model.getFilm_oyuncular());
+        values.put(FILM_TUR,model.getFilm_tur());
+        values.put(FILM_TUR_ENG,model.getFilm_tur_eng());
+        values.put(FILM_YONETMEN,model.getFilm_yonetmen());
+        values.put(FILM_SINIF,model.getFilm_sinif());
+        values.put(FILM_RESIMLER,model.getFilm_resimler());
+
+        db.insert(TABLE_NAME, null, values);
+        db.close();
     }
 }

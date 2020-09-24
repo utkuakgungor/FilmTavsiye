@@ -3,39 +3,69 @@ package com.utkuakgungor.filmtavsiye.utils;
 public class Model {
 
     private String film_adi;
-
     private String film_yili;
-
     private String film_puan;
-
     private String film_image;
-
     private String film_youtube;
-
     private String film_ozet;
-
     private String film_sure;
-
     private String film_ozet_eng;
-
     private String film_sure_eng;
-
     private String text_color;
-
     private String film_oyuncular;
-
     private String film_tur;
-
     private String film_tur_eng;
-
     private String film_yonetmen;
-
     private String film_sinif;
-
     private String film_resimler;
+    private String film_puani;
+    private String Image;
+    private String youtube;
+    private String ozet;
+    private String sure;
 
     Model() {
 
+    }
+
+    public String getFilm_puani() {
+        return film_puani;
+    }
+
+    public void setFilm_puani(String film_puani) {
+        this.film_puani = film_puani;
+    }
+
+    public String getImage() {
+        return Image;
+    }
+
+    public void setImage(String image) {
+        Image = image;
+    }
+
+    public String getYoutube() {
+        return youtube;
+    }
+
+    public void setYoutube(String youtube) {
+        this.youtube = youtube;
+    }
+
+    public String getOzet() {
+        return ozet;
+    }
+
+    public void setOzet(String ozet) {
+        this.ozet = ozet;
+    }
+
+    public String getSure() {
+        return sure;
+    }
+
+    public void setSure(String sure) {
+        this.sure = sure;
     }
 
     public String getFilm_adi() {

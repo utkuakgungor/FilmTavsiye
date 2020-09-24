@@ -2,6 +2,7 @@ package com.utkuakgungor.filmtavsiye.main;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -26,29 +27,37 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         SharedPreferences sharedPreferences=getSharedPreferences("Ayarlar",MODE_PRIVATE);
-        if(sharedPreferences.contains("Gece")){
-            setTheme(R.style.AppThemeDark);
+        if(sharedPreferences.contains("Dark")){
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+        }
+        else if(sharedPreferences.contains("Light")){
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         }
         else{
-            setTheme(R.style.AppTheme);
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
         }
         super.onCreate(savedInstanceState);
+        setTheme(R.style.AppTheme);
         setContentView(R.layout.activity_main);
-        BottomNavigationView bottomNavigationView = findViewById(R.id.main_nav);
+        BottomNavigationView bottomNavigationView = findViewById(R.id.nav_view);
         homeFragment = new HomeFragment();
         favoritesFragment = new FavoritesFragment();
         searchFragment=new SearchFragment();
+        setTitle(getResources().getString(R.string.nav_home));
         setFragment(homeFragment);
 
         bottomNavigationView.setOnNavigationItemSelectedListener(menuItem -> {
             switch(menuItem.getItemId()){
                 case R.id.nav_history:
+                    setTitle(getResources().getString(R.string.nav_home));
                     setFragment(homeFragment);
                     return true;
                 case R.id.nav_search:
+                    setTitle(getResources().getString(R.string.navsearch));
                     setFragment(searchFragment);
                     return true;
                 case R.id.nav_favorites:
+                    setTitle(getResources().getString(R.string.nav_favorites));
                     setFragment(favoritesFragment);
                     return true;
                 default:

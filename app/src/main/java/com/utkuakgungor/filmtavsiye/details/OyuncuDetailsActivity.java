@@ -73,13 +73,6 @@ public class OyuncuDetailsActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
-        SharedPreferences sharedPreferences=getSharedPreferences("Ayarlar",MODE_PRIVATE);
-        if(sharedPreferences.contains("Gece")){
-            setTheme(R.style.AppThemeDark);
-        }
-        else{
-            setTheme(R.style.AppTheme);
-        }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_oyuncudetails);
         getIncomingIntent();
@@ -121,10 +114,10 @@ public class OyuncuDetailsActivity extends AppCompatActivity {
         }
     }
 
-    private void jsonTMDB(){
+    private void jsonTMDB(String id,ImageView imageView){
         String urlBasPerson = "https://api.themoviedb.org/3/person/";
         String urlSonPerson = "?api_key="+ TMDBApi.getApiKey() +"&language=en-US";
-        JsonObjectRequest request=new JsonObjectRequest(Request.Method.GET, urlBasPerson + person_id + urlSonPerson, null,
+        JsonObjectRequest request=new JsonObjectRequest(Request.Method.GET, urlBasPerson + id + urlSonPerson, null,
                 response -> {
                     try {
                         if(Objects.equals(response.getString("homepage"),"null") || Objects.equals(response.getString("homepage"),"")){
@@ -144,6 +137,26 @@ public class OyuncuDetailsActivity extends AppCompatActivity {
                         }
                         else{
                             txt_oyuncusehir.setText(response.getString("place_of_birth"));
+                        }
+                        if(Objects.equals(response.getString("profile_path"),"null") || Objects.equals(response.getString("profile_path"),"")){
+                            Picasso.get().load(R.drawable.ic_person).into(imageView);
+                        }
+                        else{
+                            Picasso.get().load("https://image.tmdb.org/t/p/original"+response.getString("profile_path")).networkPolicy(NetworkPolicy.OFFLINE).into(imageView, new Callback() {
+                                @Override
+                                public void onSuccess() {
+
+                                }
+
+                                @Override
+                                public void onError(Exception e) {
+                                    try {
+                                        Picasso.get().load("https://image.tmdb.org/t/p/original"+response.getString("profile_path")).into(imageView);
+                                    } catch (JSONException ex) {
+                                        ex.printStackTrace();
+                                    }
+                                }
+                            });
                         }
                         dateRespond=response.getString("birthday");
                         year=dateRespond.substring(0,4);
@@ -174,10 +187,10 @@ public class OyuncuDetailsActivity extends AppCompatActivity {
         requestQueue.add(request);
     }
 
-    private void jsonSosyal(){
+    private void jsonSosyal(String id){
         String urlBasSosyal = "https://api.themoviedb.org/3/person/";
         String urlSonSosyal = "/external_ids?api_key="+ TMDBApi.getApiKey() +"&language=en-US";
-        JsonObjectRequest request=new JsonObjectRequest(Request.Method.GET, urlBasSosyal + person_id + urlSonSosyal, null,
+        JsonObjectRequest request=new JsonObjectRequest(Request.Method.GET, urlBasSosyal + id + urlSonSosyal, null,
                 response -> {
                     try {
                         if(Objects.equals(response.getString("twitter_id"),"null") || Objects.equals(response.getString("twitter_id"),"")){
@@ -265,19 +278,8 @@ public class OyuncuDetailsActivity extends AppCompatActivity {
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                 if(Objects.equals(oyuncuadi, Objects.requireNonNull(dataSnapshot.getValue(Yonetmen.class)).getYonetmen_adi())){
                     person_id= Objects.requireNonNull(dataSnapshot.getValue(Yonetmen.class)).getPerson_id();
-                    Picasso.get().load(Objects.requireNonNull(dataSnapshot.getValue(Yonetmen.class)).getYonetmen_resim_url()).networkPolicy(NetworkPolicy.OFFLINE).into(image_oyuncu, new Callback() {
-                        @Override
-                        public void onSuccess() {
-
-                        }
-
-                        @Override
-                        public void onError(Exception e) {
-                            Picasso.get().load(Objects.requireNonNull(dataSnapshot.getValue(Yonetmen.class)).getYonetmen_resim_url()).into(image_oyuncu);
-                        }
-                    });
-                    jsonTMDB();
-                    jsonSosyal();
+                    jsonTMDB(person_id,image_oyuncu);
+                    jsonSosyal(person_id);
                 }
             }
 
@@ -347,19 +349,8 @@ public class OyuncuDetailsActivity extends AppCompatActivity {
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                 if(Objects.equals(oyuncuadi, Objects.requireNonNull(dataSnapshot.getValue(Oyuncu.class)).getOyuncu_adi())){
                     person_id= Objects.requireNonNull(dataSnapshot.getValue(Oyuncu.class)).getPerson_id();
-                    Picasso.get().load(Objects.requireNonNull(dataSnapshot.getValue(Oyuncu.class)).getOyuncu_resim_url()).networkPolicy(NetworkPolicy.OFFLINE).into(image_oyuncu, new Callback() {
-                        @Override
-                        public void onSuccess() {
-
-                        }
-
-                        @Override
-                        public void onError(Exception e) {
-                            Picasso.get().load(Objects.requireNonNull(dataSnapshot.getValue(Oyuncu.class)).getOyuncu_resim_url()).into(image_oyuncu);
-                        }
-                    });
-                    jsonTMDB();
-                    jsonSosyal();
+                    jsonTMDB(person_id,image_oyuncu);
+                    jsonSosyal(person_id);
                 }
             }
 
