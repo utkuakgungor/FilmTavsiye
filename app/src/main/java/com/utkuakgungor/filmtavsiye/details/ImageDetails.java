@@ -75,6 +75,11 @@ public class ImageDetails extends AppCompatActivity {
         Drawable willBeWhite = Objects.requireNonNull(myFabSrc.getConstantState()).newDrawable();
         willBeWhite.mutate().setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
         back_fab.setImageDrawable(willBeWhite);
+        myFabSrc = ResourcesCompat.getDrawable(getResources(),R.drawable.ic_file_download,Objects.requireNonNull(getTheme()));
+        assert myFabSrc != null;
+        willBeWhite = Objects.requireNonNull(myFabSrc.getConstantState()).newDrawable();
+        willBeWhite.mutate().setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
+        fab.setImageDrawable(willBeWhite);
         back_fab.setOnClickListener(v -> onBackPressed());
         fab.setOnClickListener(v -> {
             if(ActivityCompat.checkSelfPermission(ImageDetails.this,Manifest.permission.WRITE_EXTERNAL_STORAGE)!=PackageManager.PERMISSION_GRANTED){

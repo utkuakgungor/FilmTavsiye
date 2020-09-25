@@ -19,6 +19,7 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -36,7 +37,8 @@ import java.util.Objects;
 public class HomeFragment extends Fragment {
 
     private List<Movie> result;
-    private DatabaseReference reference;
+    private FirebaseAuth firebaseAuth;
+    private DatabaseReference reference,referenceFavoriler;
     private FirebaseAdapter adapter;
 
     public HomeFragment() {
@@ -63,12 +65,16 @@ public class HomeFragment extends Fragment {
         View v =  inflater.inflate(R.layout.fragment_home, container, false);
         setHasOptionsMenu(true);
         reference= FirebaseDatabase.getInstance().getReference("Filmler");
+        firebaseAuth=FirebaseAuth.getInstance();
+        if(firebaseAuth.getCurrentUser()!=null){
+            referenceFavoriler=FirebaseDatabase.getInstance().getReference("Favoriler").child(Objects.requireNonNull(firebaseAuth.getCurrentUser().getDisplayName()));
+        }
         reference.keepSynced(true);
         result =new ArrayList<>();
         final RecyclerView recyclerView = v.findViewById(R.id.firebaselist);
         recyclerView.setHasFixedSize(true);
         StaggeredGridLayoutManager staggeredGridLayoutManager=new StaggeredGridLayoutManager(2,1);
-        adapter =new FirebaseAdapter(v.getContext(),result);
+        adapter =new FirebaseAdapter(v.getContext(),result,firebaseAuth,referenceFavoriler);
         recyclerView.setLayoutManager(staggeredGridLayoutManager);
         recyclerView.setAdapter(adapter);
         updateList();

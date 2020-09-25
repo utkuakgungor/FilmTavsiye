@@ -83,4 +83,5 @@
         <item>Light</item>
     </string-array>
     <string name="themoviedb">Movie information, movie pictures, actor information, actor pictures, director information and director pictures are taken from The Movie DB</string>
+    <string name="login_message">You can log in from the settings to store your favorites in the cloud</string>
 </resources>

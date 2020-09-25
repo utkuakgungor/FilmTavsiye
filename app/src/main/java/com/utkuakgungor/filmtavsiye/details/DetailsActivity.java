@@ -37,6 +37,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -60,6 +61,7 @@ import java.util.Arrays;
 
 public class DetailsActivity extends AppCompatActivity {
 
+    private FirebaseAuth firebaseAuth;
     private Movie movie;
     private RequestQueue requestQueue;
     private TextView oyuncuisim1,oyuncuisim2,oyuncuisim3,oyuncuisim4,oyuncuisim5,oyuncuisim6;
@@ -68,17 +70,19 @@ public class DetailsActivity extends AppCompatActivity {
     private Favorites favorites;
     private FloatingActionButton fab;
     private List<String> oyuncuList,resimList,sinifList;
+    private DatabaseReference reference_favoriler,reference_yonetmen,reference_oyuncu;
     private int dotscount;
     private ImageView[] dots;
     private int sayac=0;
-    private Snackbar snackbar;
-    private View view;
-    private TextView snackbar_text;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detay);
+        firebaseAuth=FirebaseAuth.getInstance();
+        if(firebaseAuth.getCurrentUser()!=null){
+            reference_favoriler =FirebaseDatabase.getInstance().getReference("Favoriler").child(firebaseAuth.getCurrentUser().getDisplayName());
+        }
         movie=new Movie();
         oyuncuList= new ArrayList<>();
         resimList= new ArrayList<>();
@@ -87,9 +91,9 @@ public class DetailsActivity extends AppCompatActivity {
         final Pair[] pairs = new Pair[2];
         favorites=new Favorites(DetailsActivity.this);
         final FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference reference_yonetmen = database.getReference("Yonetmenler");
+        reference_yonetmen = database.getReference("Yonetmenler");
         reference_yonetmen.keepSynced(true);
-        DatabaseReference reference_oyuncu = database.getReference("Oyuncular");
+        reference_oyuncu = database.getReference("Oyuncular");
         reference_oyuncu.keepSynced(true);
         image_yonetmen=findViewById(R.id.detayyonetmenresim);
         YouTubePlayerView youTubePlayerView = findViewById(R.id.detay_youtube_player_view);
@@ -210,20 +214,54 @@ public class DetailsActivity extends AppCompatActivity {
             }
         }
 
-        if(!favorites.Kontrol(movie.getFilm_adi())){
-            Drawable favFab = ResourcesCompat.getDrawable(getResources(),R.drawable.ic_favorite_ekli,getTheme());
-            assert favFab != null;
-            Drawable whiteFav = Objects.requireNonNull(favFab.getConstantState()).newDrawable();
-            whiteFav.mutate().setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_ATOP);
-            fab.setImageDrawable(whiteFav);
+        Drawable favFab = ResourcesCompat.getDrawable(getResources(),R.drawable.ic_favorite_beyaz,getTheme());
+        assert favFab != null;
+        Drawable whiteFav = Objects.requireNonNull(favFab.getConstantState()).newDrawable();
+        whiteFav.mutate().setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
+        fab.setImageDrawable(whiteFav);
+
+        if(firebaseAuth.getCurrentUser()!=null){
+            reference_favoriler.addChildEventListener(new ChildEventListener() {
+                @Override
+                public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                    if (Objects.requireNonNull(snapshot.getValue(Movie.class)).getFilm_adi().equals(movie.getFilm_adi())) {
+                        Drawable favFabFirebase = ResourcesCompat.getDrawable(getResources(),R.drawable.ic_favorite_ekli,getTheme());
+                        Drawable whiteFavFirebase = Objects.requireNonNull(favFabFirebase.getConstantState()).newDrawable();
+                        whiteFavFirebase.mutate().setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_ATOP);
+                        fab.setImageDrawable(whiteFavFirebase);
+                    }
+                }
+
+                @Override
+                public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+                }
+
+                @Override
+                public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+
+                }
+
+                @Override
+                public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
         }
         else{
-            Drawable favFab = ResourcesCompat.getDrawable(getResources(),R.drawable.ic_favorite_beyaz,getTheme());
-            assert favFab != null;
-            Drawable whiteFav = Objects.requireNonNull(favFab.getConstantState()).newDrawable();
-            whiteFav.mutate().setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
-            fab.setImageDrawable(whiteFav);
+            if(!favorites.Kontrol(movie.getFilm_adi())){
+                favFab = ResourcesCompat.getDrawable(getResources(),R.drawable.ic_favorite_ekli,getTheme());
+                whiteFav = Objects.requireNonNull(favFab.getConstantState()).newDrawable();
+                whiteFav.mutate().setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_ATOP);
+                fab.setImageDrawable(whiteFav);
+            }
         }
+
 
         diger.setOnClickListener(v -> {
             CustomDialogClass customDialogClass = new CustomDialogClass();
@@ -271,22 +309,27 @@ public class DetailsActivity extends AppCompatActivity {
         });
 
         fab.setOnClickListener(v -> {
-            if (favorites.Kontrol(movie.getFilm_adi())){
-                favorites.ekle(movie);
-                Snackbar.make(v,getResources().getString(R.string.favoriekle),Snackbar.LENGTH_LONG).show();
-                Drawable myFabSrc = ResourcesCompat.getDrawable(getResources(),R.drawable.ic_favorite_ekli,getTheme());
-                assert myFabSrc != null;
-                Drawable willBeWhite = Objects.requireNonNull(myFabSrc.getConstantState()).newDrawable();
-                willBeWhite.mutate().setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_ATOP);
-                fab.setImageDrawable(willBeWhite);
-            }else {
-                favorites.deleteData(movie.getFilm_adi());
-                Snackbar.make(v,getResources().getString(R.string.favoricikti),Snackbar.LENGTH_LONG).show();
-                Drawable myFabSrc = ResourcesCompat.getDrawable(getResources(),R.drawable.ic_favorite_beyaz,getTheme());
-                assert myFabSrc != null;
-                Drawable willBeWhite = Objects.requireNonNull(myFabSrc.getConstantState()).newDrawable();
-                willBeWhite.mutate().setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
-                fab.setImageDrawable(willBeWhite);
+            if(firebaseAuth.getCurrentUser()!=null){
+
+            }
+            else{
+                if (favorites.Kontrol(movie.getFilm_adi())){
+                    favorites.ekle(movie);
+                    Snackbar.make(v,getResources().getString(R.string.favoriekle),Snackbar.LENGTH_LONG).show();
+                    Drawable myFabSrc = ResourcesCompat.getDrawable(getResources(),R.drawable.ic_favorite_ekli,getTheme());
+                    assert myFabSrc != null;
+                    Drawable willBeWhite = Objects.requireNonNull(myFabSrc.getConstantState()).newDrawable();
+                    willBeWhite.mutate().setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_ATOP);
+                    fab.setImageDrawable(willBeWhite);
+                }else {
+                    favorites.deleteData(movie.getFilm_adi());
+                    Snackbar.make(v,getResources().getString(R.string.favoricikti),Snackbar.LENGTH_LONG).show();
+                    Drawable myFabSrc = ResourcesCompat.getDrawable(getResources(),R.drawable.ic_favorite_beyaz,getTheme());
+                    assert myFabSrc != null;
+                    Drawable willBeWhite = Objects.requireNonNull(myFabSrc.getConstantState()).newDrawable();
+                    willBeWhite.mutate().setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
+                    fab.setImageDrawable(willBeWhite);
+                }
             }
         });
 

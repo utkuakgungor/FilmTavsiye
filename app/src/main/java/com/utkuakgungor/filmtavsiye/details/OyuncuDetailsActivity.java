@@ -21,6 +21,7 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -48,7 +49,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class OyuncuDetailsActivity extends AppCompatActivity {
 
     private String oyuncuadi,oyuncular,secenek,person_id,day,month,year,dateRespond;
-    private DatabaseReference referenceFilmler,referenceOyuncular,referenceYonetmenler;
+    private DatabaseReference referenceFilmler,referenceOyuncular,referenceYonetmenler,referenceFavoriler;
     private TextView txt_oyuncutarih;
     private TextView txt_oyuncusehir;
     private TextView txt_oyuncusite;
@@ -60,6 +61,7 @@ public class OyuncuDetailsActivity extends AppCompatActivity {
     private ExpandableTextView expandableTextView;
     private RequestQueue requestQueue;
     private LinearLayout linearLayout;
+    private FirebaseAuth firebaseAuth;
 
     private String urlTwitter = "https://twitter.com/";
     private String urlInstagram = "https://www.instagram.com/";
@@ -74,6 +76,10 @@ public class OyuncuDetailsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        firebaseAuth=FirebaseAuth.getInstance();
+        if(firebaseAuth.getCurrentUser()!=null){
+            referenceFavoriler=FirebaseDatabase.getInstance().getReference("Favoriler").child(Objects.requireNonNull(firebaseAuth.getCurrentUser().getDisplayName()));
+        }
         setContentView(R.layout.activity_oyuncudetails);
         getIncomingIntent();
         ActionBar actionBar=getSupportActionBar();
@@ -96,7 +102,7 @@ public class OyuncuDetailsActivity extends AppCompatActivity {
         referenceYonetmenler=FirebaseDatabase.getInstance().getReference("Yonetmenler");
         list=new ArrayList<>();
         date=new StringBuilder();
-        adapter=new FirebaseAdapter(getBaseContext(),list);
+        adapter=new FirebaseAdapter(getBaseContext(),list,firebaseAuth,referenceFavoriler);
         StaggeredGridLayoutManager staggeredGridLayoutManager=new StaggeredGridLayoutManager(2,1);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(staggeredGridLayoutManager);

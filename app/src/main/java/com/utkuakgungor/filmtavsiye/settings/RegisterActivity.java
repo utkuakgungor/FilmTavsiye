@@ -13,13 +13,21 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.utkuakgungor.filmtavsiye.R;
+import com.utkuakgungor.filmtavsiye.utils.Favorites;
+import com.utkuakgungor.filmtavsiye.utils.Model;
 
+import java.util.List;
 import java.util.Objects;
 
 public class RegisterActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
+    private DatabaseReference reference;
+    private Favorites favorites;
+    private List<Model> list;
     private ProgressBar progressBar;
 
     @Override
@@ -50,6 +58,16 @@ public class RegisterActivity extends AppCompatActivity {
                 mAuth.createUserWithEmailAndPassword(emailEdit.getText().toString().trim(), passwordEdit.getText().toString())
                         .addOnCompleteListener(this, task -> {
                             if (task.isSuccessful()) {
+                                favorites=new Favorites(this);
+                                list=favorites.getDataFromDB();
+                                if(list.size()>0){
+                                    reference= FirebaseDatabase.getInstance().getReference("Favoriler").child(Objects.requireNonNull(Objects.requireNonNull(mAuth.getCurrentUser()).getDisplayName()));
+                                    for(int i=0;i<list.size();i++){
+                                        String id=reference.push().getKey();
+                                        reference.child(Objects.requireNonNull(id)).setValue(list.get(i));
+                                        favorites.deleteData(list.get(i).getFilm_adi());
+                                    }
+                                }
                                 progressBar.setVisibility(View.GONE);
                                 Toast.makeText(this, getResources().getString(R.string.text_register_success), Toast.LENGTH_LONG).show();
                                 Intent settingsIntent = new Intent(this, SettingsActivity.class);

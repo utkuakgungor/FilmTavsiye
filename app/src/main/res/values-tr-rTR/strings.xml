@@ -84,4 +84,5 @@
     </string-array>
     <string name="themoviedb">Film bilgileri,film resimleri,oyuncu bilgileri,oyuncu resimleri,yönetmen bilgileri ve yönetmen resimleri The Movie DB\'den alınmaktadır</string>
     <string name="text_logout">Çıkış Yap</string>
+    <string name="login_message">Favorilerinizi bulutta saklamak için ayarlardan giriş yapabilirsiniz</string>
 </resources>

@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -31,8 +32,9 @@ import java.util.Objects;
 
 public class TurlerDetailsActivity extends AppCompatActivity {
 
+    private FirebaseAuth firebaseAuth;
     private String tur,turler;
-    private DatabaseReference reference;
+    private DatabaseReference reference,referenceFavoriler;
     private List<Movie> result;
     private FirebaseAdapter adapter;
     private ImageView imageView;
@@ -48,6 +50,10 @@ public class TurlerDetailsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        firebaseAuth=FirebaseAuth.getInstance();
+        if(firebaseAuth.getCurrentUser()!=null){
+            referenceFavoriler=FirebaseDatabase.getInstance().getReference("Favoriler").child(Objects.requireNonNull(firebaseAuth.getCurrentUser().getDisplayName()));
+        }
         setContentView(R.layout.activity_turlerdetails);
         getIncomingIntent();
         Toolbar toolbar = findViewById(R.id.detay_toolbar);
@@ -86,7 +92,7 @@ public class TurlerDetailsActivity extends AppCompatActivity {
 
         Picasso.get().load(url).into(imageView);
         recyclerView.setLayoutManager(staggeredGridLayoutManager);
-        adapter=new FirebaseAdapter(TurlerDetailsActivity.this,result);
+        adapter=new FirebaseAdapter(TurlerDetailsActivity.this,result,firebaseAuth,referenceFavoriler);
         recyclerView.setAdapter(adapter);
         updateList();
 

@@ -16,6 +16,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -39,12 +40,13 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 public class SearchResultFragment extends Fragment {
 
+    private FirebaseAuth firebaseAuth;
     private String adi,yonetmen,oyuncu,action,adventure,science,fantasy,thriller,drama,crime,mystery,western,war,comedy,history,firebase_oyuncu,firebase_turler;
     private List<Movie> result;
     private FirebaseAdapter adapter;
     private RelativeLayout sonucyok_Relative;
     private Bundle bundle;
-    private DatabaseReference reference;
+    private DatabaseReference reference,referenceFavoriler;
 
     public SearchResultFragment() {
         // Required empty public constructor
@@ -86,6 +88,10 @@ public class SearchResultFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v =  inflater.inflate(R.layout.fragment_search_result, container, false);
         setHasOptionsMenu(true);
+        firebaseAuth=FirebaseAuth.getInstance();
+        if(firebaseAuth.getCurrentUser()!=null){
+            referenceFavoriler=FirebaseDatabase.getInstance().getReference("Favoriler").child(Objects.requireNonNull(firebaseAuth.getCurrentUser().getDisplayName()));
+        }
         sonucyok_Relative=v.findViewById(R.id.aramasonucRelative);
         bundle=getArguments();
         getData();
@@ -142,7 +148,7 @@ public class SearchResultFragment extends Fragment {
         recyclerView.setHasFixedSize(true);
         StaggeredGridLayoutManager staggeredGridLayoutManager=new StaggeredGridLayoutManager(2,1);
 
-        adapter =new FirebaseAdapter(getContext(),result);
+        adapter =new FirebaseAdapter(getContext(),result,firebaseAuth,referenceFavoriler);
         recyclerView.setLayoutManager(staggeredGridLayoutManager);
         recyclerView.setAdapter(adapter);
 

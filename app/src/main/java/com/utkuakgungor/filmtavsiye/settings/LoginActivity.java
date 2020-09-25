@@ -26,8 +26,13 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.auth.OAuthProvider;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.utkuakgungor.filmtavsiye.R;
+import com.utkuakgungor.filmtavsiye.utils.Favorites;
+import com.utkuakgungor.filmtavsiye.utils.Model;
 
+import java.util.List;
 import java.util.Objects;
 
 public class LoginActivity extends AppCompatActivity {
@@ -36,11 +41,14 @@ public class LoginActivity extends AppCompatActivity {
     private CoordinatorLayout coordinatorLayout;
     private GoogleSignInClient googleSignInClient;
     private ProgressBar progressBar;
+    private Favorites favorites;
+    private DatabaseReference reference;
+    private List<Model> list;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_webview);
+        setContentView(R.layout.activity_login);
         coordinatorLayout = findViewById(R.id.loginLayout);
         mAuth = FirebaseAuth.getInstance();
         MaterialButton loginButton = findViewById(R.id.btn_mail);
@@ -59,6 +67,16 @@ public class LoginActivity extends AppCompatActivity {
             } else {
                 mAuth.signInWithEmailAndPassword(Objects.requireNonNull(usernameEdit.getText()).toString(), Objects.requireNonNull(passwordEdit.getText()).toString())
                         .addOnSuccessListener(authResult -> {
+                            favorites=new Favorites(this);
+                            list=favorites.getDataFromDB();
+                            if(list.size()>0){
+                                reference= FirebaseDatabase.getInstance().getReference("Favoriler").child(Objects.requireNonNull(Objects.requireNonNull(mAuth.getCurrentUser()).getDisplayName()));
+                                for(int i=0;i<list.size();i++){
+                                    String id=reference.push().getKey();
+                                    reference.child(Objects.requireNonNull(id)).setValue(list.get(i));
+                                    favorites.deleteData(list.get(i).getFilm_adi());
+                                }
+                            }
                             progressBar.setVisibility(View.GONE);
                             Intent settingsInten = new Intent(this, SettingsActivity.class);
                             settingsInten.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -100,6 +118,16 @@ public class LoginActivity extends AppCompatActivity {
         if (pendingResultTask != null) {
             pendingResultTask.addOnSuccessListener(
                     authResult -> {
+                        favorites=new Favorites(this);
+                        list=favorites.getDataFromDB();
+                        if(list.size()>0){
+                            reference= FirebaseDatabase.getInstance().getReference("Favoriler").child(Objects.requireNonNull(Objects.requireNonNull(mAuth.getCurrentUser()).getDisplayName()));
+                            for(int i=0;i<list.size();i++){
+                                String id=reference.push().getKey();
+                                reference.child(Objects.requireNonNull(id)).setValue(list.get(i));
+                                favorites.deleteData(list.get(i).getFilm_adi());
+                            }
+                        }
                         progressBar.setVisibility(View.GONE);
                         Intent settingsInten = new Intent(this, SettingsActivity.class);
                         settingsInten.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -123,6 +151,16 @@ public class LoginActivity extends AppCompatActivity {
             mAuth.startActivityForSignInWithProvider(this, provider.build())
                     .addOnSuccessListener(
                             authResult -> {
+                                favorites=new Favorites(this);
+                                list=favorites.getDataFromDB();
+                                if(list.size()>0){
+                                    reference= FirebaseDatabase.getInstance().getReference("Favoriler").child(Objects.requireNonNull(Objects.requireNonNull(mAuth.getCurrentUser()).getDisplayName()));
+                                    for(int i=0;i<list.size();i++){
+                                        String id=reference.push().getKey();
+                                        reference.child(Objects.requireNonNull(id)).setValue(list.get(i));
+                                        favorites.deleteData(list.get(i).getFilm_adi());
+                                    }
+                                }
                                 progressBar.setVisibility(View.GONE);
                                 Intent settingsInten = new Intent(this, SettingsActivity.class);
                                 settingsInten.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -173,6 +211,16 @@ public class LoginActivity extends AppCompatActivity {
         AuthCredential authCredential = GoogleAuthProvider.getCredential(account.getIdToken(), null);
         mAuth.signInWithCredential(authCredential)
                 .addOnSuccessListener(authResult -> {
+                    favorites=new Favorites(this);
+                    list=favorites.getDataFromDB();
+                    if(list.size()>0){
+                        reference= FirebaseDatabase.getInstance().getReference("Favoriler").child(Objects.requireNonNull(Objects.requireNonNull(mAuth.getCurrentUser()).getDisplayName()));
+                        for(int i=0;i<list.size();i++){
+                            String id=reference.push().getKey();
+                            reference.child(Objects.requireNonNull(id)).setValue(list.get(i));
+                            favorites.deleteData(list.get(i).getFilm_adi());
+                        }
+                    }
                     progressBar.setVisibility(View.GONE);
                     Intent settingsInten = new Intent(coordinatorLayout.getContext(), SettingsActivity.class);
                     settingsInten.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
