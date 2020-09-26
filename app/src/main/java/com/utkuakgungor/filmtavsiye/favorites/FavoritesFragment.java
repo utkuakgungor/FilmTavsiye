@@ -24,11 +24,12 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.utkuakgungor.filmtavsiye.R;
+import com.utkuakgungor.filmtavsiye.models.MovieFirebase;
 import com.utkuakgungor.filmtavsiye.settings.SettingsActivity;
 import com.utkuakgungor.filmtavsiye.utils.Favorites;
 import com.utkuakgungor.filmtavsiye.utils.FirebaseAdapter;
-import com.utkuakgungor.filmtavsiye.utils.Model;
-import com.utkuakgungor.filmtavsiye.utils.Movie;
+import com.utkuakgungor.filmtavsiye.models.Model;
+import com.utkuakgungor.filmtavsiye.models.Movie;
 import com.utkuakgungor.filmtavsiye.utils.RecyclerAdapter;
 
 import java.util.ArrayList;
@@ -42,7 +43,7 @@ public class FavoritesFragment extends Fragment {
     private FirebaseAuth firebaseAuth;
     private DatabaseReference reference;
     private List<Model> dbList;
-    private List<Movie> dbListFirebase;
+    private List<MovieFirebase> dbListFirebase;
     private Favorites favori;
     private RecyclerView recyclerView;
     private View v;
@@ -115,7 +116,7 @@ public class FavoritesFragment extends Fragment {
         reference.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                dbListFirebase.add(snapshot.getValue(Movie.class));
+                dbListFirebase.add(snapshot.getValue(MovieFirebase.class));
                 adapter.notifyDataSetChanged();
             }
 
@@ -165,7 +166,7 @@ public class FavoritesFragment extends Fragment {
         }
         else{
             if(!dbList.isEmpty()){
-                if(favori.Kontrol(dbList.get(adapter.getSira()).getFilm_adi())){
+                if(favori.Kontrol(dbList.get(adapter.getSira()).getFilm_id())){
                     dbList.remove(adapter.getSira());
                     adapter.notifyDataSetChanged();
                     adapter.notifyItemRangeChanged(adapter.getSira(),adapter.getItemCount());

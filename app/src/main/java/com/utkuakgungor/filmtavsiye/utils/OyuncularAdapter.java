@@ -20,6 +20,7 @@ import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 import com.utkuakgungor.filmtavsiye.R;
 import com.utkuakgungor.filmtavsiye.details.OyuncuDetailsActivity;
+import com.utkuakgungor.filmtavsiye.models.Oyuncu;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,12 +36,10 @@ public class OyuncularAdapter extends RecyclerView.Adapter<OyuncularAdapter.View
 
     private List<Oyuncu> list;
     private Pair[] pairs;
-    private RequestQueue requestQueue;
 
     OyuncularAdapter(Context context, List<Oyuncu> list) {
         this.list = new ArrayList<>();
         this.list = list;
-        requestQueue= Volley.newRequestQueue(context);
     }
 
     @NonNull
@@ -53,45 +52,27 @@ public class OyuncularAdapter extends RecyclerView.Adapter<OyuncularAdapter.View
 
     @Override
     public void onBindViewHolder(@NonNull final OyuncularAdapter.ViewHolder holder, final int position) {
-        final Oyuncu user = list.get(position);
         pairs = new Pair[2];
-        holder.txt_oyuncu.setText(user.getOyuncu_adi());
-        String urlBasPerson = "https://api.themoviedb.org/3/person/";
-        String urlSonPerson = "?api_key=" + TMDBApi.getApiKey() + "&language=en-US";
-        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, urlBasPerson + user.getPerson_id() + urlSonPerson, null,
-                response -> {
-                    try {
-                        if (Objects.equals(response.getString("profile_path"), "null") || Objects.equals(response.getString("profile_path"), "")) {
-                            Picasso.get().load(R.drawable.ic_person).into(holder.txt_image);
-                        } else {
-                            Picasso.get().load("https://image.tmdb.org/t/p/original" + response.getString("profile_path")).networkPolicy(NetworkPolicy.OFFLINE).into(holder.txt_image, new Callback() {
-                                @Override
-                                public void onSuccess() {
+        holder.txt_oyuncu.setText(list.get(position).getOyuncuAdi());
+        String url = "https://image.tmdb.org/t/p/original" + list.get(position).getOyuncuResim();
 
-                                }
+        Picasso.get().load(url).networkPolicy(NetworkPolicy.OFFLINE).into(holder.txt_image, new Callback() {
+            @Override
+            public void onSuccess() {
 
-                                @Override
-                                public void onError(Exception e) {
-                                    try {
-                                        Picasso.get().load("https://image.tmdb.org/t/p/original" + response.getString("profile_path")).into(holder.txt_image);
-                                    } catch (JSONException ex) {
-                                        ex.printStackTrace();
-                                    }
-                                }
-                            });
-                        }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }, Throwable::printStackTrace);
-        requestQueue.add(request);
+            }
+
+            @Override
+            public void onError(Exception e) {
+                Picasso.get().load(url).into(holder.txt_image);
+            }
+        });
 
         holder.txt_relative.setOnClickListener(v -> {
             Intent intent = new Intent(v.getContext(), OyuncuDetailsActivity.class);
             pairs[0] = new Pair<View, String>(holder.txt_image, "picture");
             pairs[1] = new Pair<View, String>(holder.txt_oyuncu, "text");
-            intent.putExtra("oyuncu", list.get(position).getOyuncu_adi());
-            intent.putExtra("secenek", "oyuncu");
+            intent.putExtra("person_id", list.get(position).getOyuncuID());
             ActivityOptions activityOptions = ActivityOptions.makeSceneTransitionAnimation((Activity) v.getContext(), pairs);
             v.getContext().startActivity(intent, activityOptions.toBundle());
         });

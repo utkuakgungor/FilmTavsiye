@@ -22,8 +22,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.squareup.picasso.Picasso;
 import com.utkuakgungor.filmtavsiye.R;
+import com.utkuakgungor.filmtavsiye.models.MovieFirebase;
 import com.utkuakgungor.filmtavsiye.utils.FirebaseAdapter;
-import com.utkuakgungor.filmtavsiye.utils.Movie;
+import com.utkuakgungor.filmtavsiye.models.Movie;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +36,7 @@ public class TurlerDetailsActivity extends AppCompatActivity {
     private FirebaseAuth firebaseAuth;
     private String tur,turler;
     private DatabaseReference reference,referenceFavoriler;
-    private List<Movie> result;
+    private List<MovieFirebase> result;
     private FirebaseAdapter adapter;
     private ImageView imageView;
 
@@ -103,13 +104,13 @@ public class TurlerDetailsActivity extends AppCompatActivity {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, String s) {
                 if(Objects.equals(Locale.getDefault().getDisplayLanguage(),"English")){
-                    turler = Objects.requireNonNull(dataSnapshot.getValue(Movie.class)).getFilm_tur_eng().replace(",","");
+                    turler = Objects.requireNonNull(dataSnapshot.getValue(MovieFirebase.class)).getFilm_tur_eng().replace(",","");
                 }
                 else{
-                    turler=Objects.requireNonNull(dataSnapshot.getValue(Movie.class)).getFilm_tur().replace(",","");
+                    turler=Objects.requireNonNull(dataSnapshot.getValue(MovieFirebase.class)).getFilm_tur().replace(",","");
                 }
                 if(turler.contains(tur)){
-                    result.add(dataSnapshot.getValue(Movie.class));
+                    result.add(dataSnapshot.getValue(MovieFirebase.class));
                     adapter.notifyDataSetChanged();
                 }
             }

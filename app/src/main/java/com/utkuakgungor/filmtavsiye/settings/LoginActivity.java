@@ -30,7 +30,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.utkuakgungor.filmtavsiye.R;
 import com.utkuakgungor.filmtavsiye.utils.Favorites;
-import com.utkuakgungor.filmtavsiye.utils.Model;
+import com.utkuakgungor.filmtavsiye.models.Model;
 
 import java.util.List;
 import java.util.Objects;
@@ -74,7 +74,7 @@ public class LoginActivity extends AppCompatActivity {
                                 for(int i=0;i<list.size();i++){
                                     String id=reference.push().getKey();
                                     reference.child(Objects.requireNonNull(id)).setValue(list.get(i));
-                                    favorites.deleteData(list.get(i).getFilm_adi());
+                                    favorites.deleteData(list.get(i).getFilm_id());
                                 }
                             }
                             progressBar.setVisibility(View.GONE);
@@ -125,7 +125,7 @@ public class LoginActivity extends AppCompatActivity {
                             for(int i=0;i<list.size();i++){
                                 String id=reference.push().getKey();
                                 reference.child(Objects.requireNonNull(id)).setValue(list.get(i));
-                                favorites.deleteData(list.get(i).getFilm_adi());
+                                favorites.deleteData(list.get(i).getFilm_id());
                             }
                         }
                         progressBar.setVisibility(View.GONE);
@@ -158,7 +158,7 @@ public class LoginActivity extends AppCompatActivity {
                                     for(int i=0;i<list.size();i++){
                                         String id=reference.push().getKey();
                                         reference.child(Objects.requireNonNull(id)).setValue(list.get(i));
-                                        favorites.deleteData(list.get(i).getFilm_adi());
+                                        favorites.deleteData(list.get(i).getFilm_id());
                                     }
                                 }
                                 progressBar.setVisibility(View.GONE);
@@ -218,7 +218,7 @@ public class LoginActivity extends AppCompatActivity {
                         for(int i=0;i<list.size();i++){
                             String id=reference.push().getKey();
                             reference.child(Objects.requireNonNull(id)).setValue(list.get(i));
-                            favorites.deleteData(list.get(i).getFilm_adi());
+                            favorites.deleteData(list.get(i).getFilm_id());
                         }
                     }
                     progressBar.setVisibility(View.GONE);

@@ -20,7 +20,6 @@
         <meta-data
             android:name="firebase_performance_logcat_enabled"
             android:value="true" />
-
         <activity
             android:name=".main.MainActivity"
             android:hardwareAccelerated="true"
@@ -28,54 +27,52 @@
             android:theme="@style/AppTheme.Launcher">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-
-                <data android:scheme="filmtavsiye" />
             </intent-filter>
         </activity>
         <activity
             android:theme="@style/AppThemeNoActionBar"
             android:name=".details.DetailsActivity"
-            android:hardwareAccelerated="true"
             android:parentActivityName=".main.MainActivity"
-            android:screenOrientation="portrait">
-        </activity>
+            android:hardwareAccelerated="true"
+            android:screenOrientation="portrait"/>
         <activity
             android:theme="@style/AppThemeNoActionBar"
             android:name=".details.ImageDetails"
+            android:parentActivityName=".details.DetailsActivity"
             android:hardwareAccelerated="true"
             android:screenOrientation="portrait"/>
         <activity
             android:theme="@style/AppThemeNoActionBar"
             android:name=".details.TurlerDetailsActivity"
             android:hardwareAccelerated="true"
+            android:parentActivityName=".details.DetailsActivity"
             android:screenOrientation="portrait" />
         <activity
             android:theme="@style/AppThemeNoActionBar"
             android:name=".settings.WebViewActivity"
+            android:parentActivityName=".settings.SettingsActivity"
             android:hardwareAccelerated="true"
             android:screenOrientation="portrait"/>
         <activity
             android:name=".details.OyuncuDetailsActivity"
             android:hardwareAccelerated="true"
+            android:parentActivityName=".details.DetailsActivity"
             android:screenOrientation="portrait"/>
         <activity
             android:name=".settings.SettingsActivity"
             android:hardwareAccelerated="true"
+            android:parentActivityName=".main.MainActivity"
             android:screenOrientation="portrait"/>
         <activity
             android:name=".settings.LoginActivity"
             android:hardwareAccelerated="true"
+            android:parentActivityName=".settings.SettingsActivity"
             android:screenOrientation="portrait"/>
         <activity
             android:name=".settings.RegisterActivity"
             android:hardwareAccelerated="true"
+            android:parentActivityName=".settings.LoginActivity"
             android:screenOrientation="portrait"/>
     </application>
 
