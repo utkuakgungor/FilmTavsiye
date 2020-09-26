@@ -33,8 +33,6 @@ import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 import com.utkuakgungor.filmtavsiye.R;
 import com.utkuakgungor.filmtavsiye.models.APIPersonMovies;
-import com.utkuakgungor.filmtavsiye.models.Cast;
-import com.utkuakgungor.filmtavsiye.models.Crew;
 import com.utkuakgungor.filmtavsiye.models.MovieFirebase;
 import com.utkuakgungor.filmtavsiye.utils.FirebaseAdapter;
 import com.utkuakgungor.filmtavsiye.models.Movie;
@@ -62,7 +60,7 @@ public class OyuncuDetailsActivity extends AppCompatActivity {
     private RequestQueue requestQueue;
     private LinearLayout linearLayout;
     private FirebaseAuth firebaseAuth;
-    private APIPersonMovies apiData;
+    private APIPersonMovies data;
 
     public boolean onOptionsItemSelected(MenuItem item) {
         onBackPressed();
@@ -230,15 +228,15 @@ public class OyuncuDetailsActivity extends AppCompatActivity {
         String url = "https://api.themoviedb.org/3/person/" + person_id + "/movie_credits?api_key=" + TMDBApi.getApiKey();
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url, null,
                 response -> {
-                    String jsonString = response.toString();
-                    Gson gson = new Gson();
-                    apiData = gson.fromJson(jsonString, APIPersonMovies.class);
+                        String responseString = response.toString();
+                        Gson gson=new Gson();
+                        data=gson.fromJson(responseString,APIPersonMovies.class);
                     if (secenek.equals("oyuncu")) {
                         referenceFilmler.addChildEventListener(new ChildEventListener() {
                             @Override
                             public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                                for (int i = 0; i < apiData.getCast().size(); i++) {
-                                    if (apiData.getCast().get(i).getId().equals(Integer.parseInt(Objects.requireNonNull(snapshot.getValue(Movie.class)).getFilm_id()))) {
+                                for (int i = 0; i < data.getCast().size(); i++) {
+                                    if (data.getCast().get(i).getId().equals(Integer.parseInt(Objects.requireNonNull(snapshot.getValue(Movie.class)).getFilm_id()))) {
                                         list.add(snapshot.getValue(MovieFirebase.class));
                                         adapter.notifyDataSetChanged();
                                     }
@@ -269,8 +267,8 @@ public class OyuncuDetailsActivity extends AppCompatActivity {
                         referenceFilmler.addChildEventListener(new ChildEventListener() {
                             @Override
                             public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                                for (int i = 0; i < apiData.getCast().size(); i++) {
-                                    if (apiData.getCrew().get(i).getId().equals(Integer.parseInt(Objects.requireNonNull(snapshot.getValue(Movie.class)).getFilm_id()))) {
+                                for (int i = 0; i < data.getCast().size(); i++) {
+                                    if (data.getCrew().get(i).getId().equals(Integer.parseInt(Objects.requireNonNull(snapshot.getValue(Movie.class)).getFilm_id()))) {
                                         list.add(snapshot.getValue(MovieFirebase.class));
                                         adapter.notifyDataSetChanged();
                                     }

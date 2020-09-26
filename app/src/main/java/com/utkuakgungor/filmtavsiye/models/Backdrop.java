@@ -8,31 +8,31 @@ public class Backdrop {
 
     @SerializedName("aspect_ratio")
     @Expose
-    private Double aspectRatio;
+    private String aspectRatio;
     @SerializedName("file_path")
     @Expose
     private String filePath;
     @SerializedName("height")
     @Expose
-    private Integer height;
+    private String height;
     @SerializedName("iso_639_1")
     @Expose
-    private Object iso6391;
+    private String iso6391;
     @SerializedName("vote_average")
     @Expose
-    private Double voteAverage;
+    private String voteAverage;
     @SerializedName("vote_count")
     @Expose
-    private Integer voteCount;
+    private String voteCount;
     @SerializedName("width")
     @Expose
-    private Integer width;
+    private String width;
 
-    public Double getAspectRatio() {
+    public String getAspectRatio() {
         return aspectRatio;
     }
 
-    public void setAspectRatio(Double aspectRatio) {
+    public void setAspectRatio(String aspectRatio) {
         this.aspectRatio = aspectRatio;
     }
 
@@ -44,43 +44,43 @@ public class Backdrop {
         this.filePath = filePath;
     }
 
-    public Integer getHeight() {
+    public String getHeight() {
         return height;
     }
 
-    public void setHeight(Integer height) {
+    public void setHeight(String height) {
         this.height = height;
     }
 
-    public Object getIso6391() {
+    public String getIso6391() {
         return iso6391;
     }
 
-    public void setIso6391(Object iso6391) {
+    public void setIso6391(String iso6391) {
         this.iso6391 = iso6391;
     }
 
-    public Double getVoteAverage() {
+    public String getVoteAverage() {
         return voteAverage;
     }
 
-    public void setVoteAverage(Double voteAverage) {
+    public void setVoteAverage(String voteAverage) {
         this.voteAverage = voteAverage;
     }
 
-    public Integer getVoteCount() {
+    public String getVoteCount() {
         return voteCount;
     }
 
-    public void setVoteCount(Integer voteCount) {
+    public void setVoteCount(String voteCount) {
         this.voteCount = voteCount;
     }
 
-    public Integer getWidth() {
+    public String getWidth() {
         return width;
     }
 
-    public void setWidth(Integer width) {
+    public void setWidth(String width) {
         this.width = width;
     }
 

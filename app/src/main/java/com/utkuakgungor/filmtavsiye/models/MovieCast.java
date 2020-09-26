@@ -8,7 +8,7 @@ public class MovieCast {
 
     @SerializedName("cast_id")
     @Expose
-    private Integer castId;
+    private String castId;
     @SerializedName("character")
     @Expose
     private String character;
@@ -17,25 +17,25 @@ public class MovieCast {
     private String creditId;
     @SerializedName("gender")
     @Expose
-    private Integer gender;
+    private String gender;
     @SerializedName("id")
     @Expose
-    private Integer id;
+    private String id;
     @SerializedName("name")
     @Expose
     private String name;
     @SerializedName("order")
     @Expose
-    private Integer order;
+    private String order;
     @SerializedName("profile_path")
     @Expose
     private String profilePath;
 
-    public Integer getCastId() {
+    public String getCastId() {
         return castId;
     }
 
-    public void setCastId(Integer castId) {
+    public void setCastId(String castId) {
         this.castId = castId;
     }
 
@@ -55,19 +55,19 @@ public class MovieCast {
         this.creditId = creditId;
     }
 
-    public Integer getGender() {
+    public String getGender() {
         return gender;
     }
 
-    public void setGender(Integer gender) {
+    public void setGender(String gender) {
         this.gender = gender;
     }
 
-    public Integer getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -79,11 +79,11 @@ public class MovieCast {
         this.name = name;
     }
 
-    public Integer getOrder() {
+    public String getOrder() {
         return order;
     }
 
-    public void setOrder(Integer order) {
+    public void setOrder(String order) {
         this.order = order;
     }
 

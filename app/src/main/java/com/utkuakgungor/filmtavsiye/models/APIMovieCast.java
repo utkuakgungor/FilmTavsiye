@@ -10,7 +10,7 @@ public class APIMovieCast implements Serializable {
 
     @SerializedName("id")
     @Expose
-    private Integer id;
+    private String id;
     @SerializedName("cast")
     @Expose
     private List<MovieCast> cast = null;
@@ -18,11 +18,11 @@ public class APIMovieCast implements Serializable {
     @Expose
     private List<MovieCrew> crew = null;
 
-    public Integer getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(String id) {
         this.id = id;
     }
 

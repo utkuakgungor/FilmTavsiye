@@ -17,6 +17,11 @@ android {
         sourceCompatibility = "8"
     }
     buildTypes {
+        debug {
+            shrinkResources true
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
         release {
             shrinkResources true
             minifyEnabled true

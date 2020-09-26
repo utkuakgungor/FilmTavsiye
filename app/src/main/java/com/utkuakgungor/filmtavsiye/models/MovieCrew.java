@@ -14,10 +14,10 @@ public class MovieCrew {
     private String department;
     @SerializedName("gender")
     @Expose
-    private Integer gender;
+    private String gender;
     @SerializedName("id")
     @Expose
-    private Integer id;
+    private String id;
     @SerializedName("job")
     @Expose
     private String job;
@@ -26,7 +26,7 @@ public class MovieCrew {
     private String name;
     @SerializedName("profile_path")
     @Expose
-    private Object profilePath;
+    private String profilePath;
 
     public String getCreditId() {
         return creditId;
@@ -44,19 +44,19 @@ public class MovieCrew {
         this.department = department;
     }
 
-    public Integer getGender() {
+    public String getGender() {
         return gender;
     }
 
-    public void setGender(Integer gender) {
+    public void setGender(String gender) {
         this.gender = gender;
     }
 
-    public Integer getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -76,11 +76,11 @@ public class MovieCrew {
         this.name = name;
     }
 
-    public Object getProfilePath() {
+    public String getProfilePath() {
         return profilePath;
     }
 
-    public void setProfilePath(Object profilePath) {
+    public void setProfilePath(String profilePath) {
         this.profilePath = profilePath;
     }
 

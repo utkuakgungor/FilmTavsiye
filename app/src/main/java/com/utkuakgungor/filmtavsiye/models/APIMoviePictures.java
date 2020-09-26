@@ -9,7 +9,7 @@ public class APIMoviePictures {
 
     @SerializedName("id")
     @Expose
-    private Integer id;
+    private String id;
     @SerializedName("backdrops")
     @Expose
     private List<Backdrop> backdrops = null;
@@ -17,11 +17,11 @@ public class APIMoviePictures {
     @Expose
     private List<Poster> posters = null;
 
-    public Integer getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(String id) {
         this.id = id;
     }
 

@@ -18,22 +18,22 @@ public class Cast {
     private String releaseDate;
     @SerializedName("vote_count")
     @Expose
-    private Integer voteCount;
+    private String voteCount;
     @SerializedName("video")
     @Expose
-    private Boolean video;
+    private String video;
     @SerializedName("adult")
     @Expose
-    private Boolean adult;
+    private String adult;
     @SerializedName("vote_average")
     @Expose
-    private Integer voteAverage;
+    private String voteAverage;
     @SerializedName("title")
     @Expose
     private String title;
     @SerializedName("genre_ids")
     @Expose
-    private List<Integer> genreIds = null;
+    private List<String> genreIds = null;
     @SerializedName("original_language")
     @Expose
     private String originalLanguage;
@@ -42,10 +42,10 @@ public class Cast {
     private String originalTitle;
     @SerializedName("popularity")
     @Expose
-    private Double popularity;
+    private String popularity;
     @SerializedName("id")
     @Expose
-    private Integer id;
+    private String id;
     @SerializedName("backdrop_path")
     @Expose
     private String backdropPath;
@@ -80,35 +80,35 @@ public class Cast {
         this.releaseDate = releaseDate;
     }
 
-    public Integer getVoteCount() {
+    public String getVoteCount() {
         return voteCount;
     }
 
-    public void setVoteCount(Integer voteCount) {
+    public void setVoteCount(String voteCount) {
         this.voteCount = voteCount;
     }
 
-    public Boolean getVideo() {
+    public String getVideo() {
         return video;
     }
 
-    public void setVideo(Boolean video) {
+    public void setVideo(String video) {
         this.video = video;
     }
 
-    public Boolean getAdult() {
+    public String getAdult() {
         return adult;
     }
 
-    public void setAdult(Boolean adult) {
+    public void setAdult(String adult) {
         this.adult = adult;
     }
 
-    public Integer getVoteAverage() {
+    public String getVoteAverage() {
         return voteAverage;
     }
 
-    public void setVoteAverage(Integer voteAverage) {
+    public void setVoteAverage(String voteAverage) {
         this.voteAverage = voteAverage;
     }
 
@@ -120,11 +120,11 @@ public class Cast {
         this.title = title;
     }
 
-    public List<Integer> getGenreIds() {
+    public List<String> getGenreIds() {
         return genreIds;
     }
 
-    public void setGenreIds(List<Integer> genreIds) {
+    public void setGenreIds(List<String> genreIds) {
         this.genreIds = genreIds;
     }
 
@@ -144,19 +144,19 @@ public class Cast {
         this.originalTitle = originalTitle;
     }
 
-    public Double getPopularity() {
+    public String getPopularity() {
         return popularity;
     }
 
-    public void setPopularity(Double popularity) {
+    public void setPopularity(String popularity) {
         this.popularity = popularity;
     }
 
-    public Integer getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -183,5 +183,4 @@ public class Cast {
     public void setPosterPath(String posterPath) {
         this.posterPath = posterPath;
     }
-
 }

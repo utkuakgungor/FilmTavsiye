@@ -83,7 +83,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.UserVi
                                 Gson gsonTR = new Gson();
                                 APIMovie dataTR = gsonTR.fromJson(jsonStringTR, APIMovie.class);
                                 holder.txt_film_adi.setText(data.getTitle());
-                                holder.txt_film_puani.setText(Double.toString(data.getVoteAverage()));
+                                holder.txt_film_puani.setText(data.getVoteAverage());
                                 Picasso.get().load(url+ data.getPosterPath()).networkPolicy(NetworkPolicy.OFFLINE).into(holder.txt_image, new Callback() {
                                     @Override
                                     public void onSuccess() {
@@ -192,9 +192,9 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.UserVi
                                     intent.putExtra("puan", data.getVoteAverage());
                                     intent.putExtra("image", url+data.getPosterPath());
                                     intent.putExtra("ozet", dataTR.getOverview());
-                                    intent.putExtra("sure", data.getRuntime()/60+" saat "+data.getRuntime()%60+" dakika");
+                                    intent.putExtra("sure", Integer.parseInt(data.getRuntime())/60+" saat "+Integer.parseInt(data.getRuntime())%60+" dakika");
                                     intent.putExtra("ozet_eng", data.getOverview());
-                                    intent.putExtra("sure_eng", data.getRuntime()/60+" hours "+data.getRuntime()%60+" minutes");
+                                    intent.putExtra("sure_eng", Integer.parseInt(data.getRuntime())/60+" hours "+Integer.parseInt(data.getRuntime())%60+" minutes");
                                     intent.putExtra("tur", list.get(position).getFilm_tur());
                                     intent.putExtra("tur_eng", list.get(position).getFilm_tur_eng());
                                     intent.putExtra("sinif", list.get(position).getFilm_sinif());

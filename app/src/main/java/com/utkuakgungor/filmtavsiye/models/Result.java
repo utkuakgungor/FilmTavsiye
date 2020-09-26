@@ -26,7 +26,7 @@ public class Result {
     private String site;
     @SerializedName("size")
     @Expose
-    private Integer size;
+    private String size;
     @SerializedName("type")
     @Expose
     private String type;
@@ -79,11 +79,11 @@ public class Result {
         this.site = site;
     }
 
-    public Integer getSize() {
+    public String getSize() {
         return size;
     }
 
-    public void setSize(Integer size) {
+    public void setSize(String size) {
         this.size = size;
     }
 

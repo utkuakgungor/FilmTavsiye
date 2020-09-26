@@ -9,7 +9,7 @@ public class APIMovie {
 
     @SerializedName("adult")
     @Expose
-    private Boolean adult;
+    private String adult;
     @SerializedName("backdrop_path")
     @Expose
     private String backdropPath;
@@ -18,7 +18,7 @@ public class APIMovie {
     private BelongsToCollection belongsToCollection;
     @SerializedName("budget")
     @Expose
-    private Integer budget;
+    private String budget;
     @SerializedName("genres")
     @Expose
     private List<Genre> genres = null;
@@ -27,7 +27,7 @@ public class APIMovie {
     private String homepage;
     @SerializedName("id")
     @Expose
-    private Integer id;
+    private String id;
     @SerializedName("imdb_id")
     @Expose
     private String imdbId;
@@ -42,7 +42,7 @@ public class APIMovie {
     private String overview;
     @SerializedName("popularity")
     @Expose
-    private Double popularity;
+    private String popularity;
     @SerializedName("poster_path")
     @Expose
     private String posterPath;
@@ -57,10 +57,10 @@ public class APIMovie {
     private String releaseDate;
     @SerializedName("revenue")
     @Expose
-    private Integer revenue;
+    private String revenue;
     @SerializedName("runtime")
     @Expose
-    private Integer runtime;
+    private String runtime;
     @SerializedName("spoken_languages")
     @Expose
     private List<SpokenLanguage> spokenLanguages = null;
@@ -75,19 +75,19 @@ public class APIMovie {
     private String title;
     @SerializedName("video")
     @Expose
-    private Boolean video;
+    private String video;
     @SerializedName("vote_average")
     @Expose
-    private Double voteAverage;
+    private String voteAverage;
     @SerializedName("vote_count")
     @Expose
-    private Integer voteCount;
+    private String voteCount;
 
-    public Boolean getAdult() {
+    public String getAdult() {
         return adult;
     }
 
-    public void setAdult(Boolean adult) {
+    public void setAdult(String adult) {
         this.adult = adult;
     }
 
@@ -107,11 +107,11 @@ public class APIMovie {
         this.belongsToCollection = belongsToCollection;
     }
 
-    public Integer getBudget() {
+    public String getBudget() {
         return budget;
     }
 
-    public void setBudget(Integer budget) {
+    public void setBudget(String budget) {
         this.budget = budget;
     }
 
@@ -131,11 +131,11 @@ public class APIMovie {
         this.homepage = homepage;
     }
 
-    public Integer getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -171,11 +171,11 @@ public class APIMovie {
         this.overview = overview;
     }
 
-    public Double getPopularity() {
+    public String getPopularity() {
         return popularity;
     }
 
-    public void setPopularity(Double popularity) {
+    public void setPopularity(String popularity) {
         this.popularity = popularity;
     }
 
@@ -211,19 +211,19 @@ public class APIMovie {
         this.releaseDate = releaseDate;
     }
 
-    public Integer getRevenue() {
+    public String getRevenue() {
         return revenue;
     }
 
-    public void setRevenue(Integer revenue) {
+    public void setRevenue(String revenue) {
         this.revenue = revenue;
     }
 
-    public Integer getRuntime() {
+    public String getRuntime() {
         return runtime;
     }
 
-    public void setRuntime(Integer runtime) {
+    public void setRuntime(String runtime) {
         this.runtime = runtime;
     }
 
@@ -259,27 +259,27 @@ public class APIMovie {
         this.title = title;
     }
 
-    public Boolean getVideo() {
+    public String getVideo() {
         return video;
     }
 
-    public void setVideo(Boolean video) {
+    public void setVideo(String video) {
         this.video = video;
     }
 
-    public Double getVoteAverage() {
+    public String getVoteAverage() {
         return voteAverage;
     }
 
-    public void setVoteAverage(Double voteAverage) {
+    public void setVoteAverage(String voteAverage) {
         this.voteAverage = voteAverage;
     }
 
-    public Integer getVoteCount() {
+    public String getVoteCount() {
         return voteCount;
     }
 
-    public void setVoteCount(Integer voteCount) {
+    public void setVoteCount(String voteCount) {
         this.voteCount = voteCount;
     }
 

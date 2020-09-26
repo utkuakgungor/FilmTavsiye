@@ -362,7 +362,7 @@ public class DetailsActivity extends AppCompatActivity {
                     Gson gson = new Gson();
                     dataPictures = gson.fromJson(jsonString, APIMoviePictures.class);
                     for (int i = 0; i < dataPictures.getBackdrops().size(); i++) {
-                        if (Double.compare(dataPictures.getBackdrops().get(i).getAspectRatio(), 1) > 0) {
+                        if (Double.compare(Double.parseDouble(dataPictures.getBackdrops().get(i).getAspectRatio()), 1) > 0) {
                             resimlerList.add("https://image.tmdb.org/t/p/original" + dataPictures.getBackdrops().get(i).getFilePath());
                         }
                     }
