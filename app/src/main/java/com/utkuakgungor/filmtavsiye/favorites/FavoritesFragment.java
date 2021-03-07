@@ -2,6 +2,7 @@ package com.utkuakgungor.filmtavsiye.favorites;
 
 import android.content.Intent;
 import android.os.Bundle;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -14,6 +15,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
@@ -39,7 +41,6 @@ import java.util.Objects;
 public class FavoritesFragment extends Fragment {
 
     private RecyclerAdapter adapter;
-    private FirebaseAdapter firebaseAdapter;
     private FirebaseAuth firebaseAuth;
     private DatabaseReference reference;
     private List<Model> dbList;
@@ -47,6 +48,7 @@ public class FavoritesFragment extends Fragment {
     private Favorites favori;
     private RecyclerView recyclerView;
     private View v;
+    private FirebaseAdapter adapterFirebase;
 
     public FavoritesFragment() {
         // Required empty public constructor
@@ -54,7 +56,7 @@ public class FavoritesFragment extends Fragment {
 
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_action,menu);
+        inflater.inflate(R.menu.menu_action, menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
 
@@ -72,40 +74,25 @@ public class FavoritesFragment extends Fragment {
         v = inflater.inflate(R.layout.fragment_favorites, container, false);
         recyclerView = v.findViewById(R.id.firebaselist);
         setHasOptionsMenu(true);
-        dbListFirebase=new ArrayList<>();
+        dbListFirebase = new ArrayList<>();
         recyclerView.setHasFixedSize(true);
-        final StaggeredGridLayoutManager staggeredGridLayoutManager=new StaggeredGridLayoutManager(2,1);
+        final StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(2, 1);
         recyclerView.setLayoutManager(staggeredGridLayoutManager);
-        firebaseAuth=FirebaseAuth.getInstance();
-        if(firebaseAuth.getCurrentUser()!=null){
-            reference= FirebaseDatabase.getInstance().getReference("Favoriler").child(Objects.requireNonNull(firebaseAuth.getCurrentUser().getDisplayName()));
-            firebaseAdapter = new FirebaseAdapter(v.getContext(),dbListFirebase,firebaseAuth,reference);
+        firebaseAuth = FirebaseAuth.getInstance();
+        if (firebaseAuth.getCurrentUser() != null) {
+            reference = FirebaseDatabase.getInstance().getReference("Favoriler").child(Objects.requireNonNull(firebaseAuth.getCurrentUser().getEmail().replace(".", "").replace("#", "").replace("$", "").replace("[", "").replace("]", "")));
+            adapterFirebase = new FirebaseAdapter("favorites", v.getContext(), dbListFirebase, firebaseAuth, reference);
             getFirebaseData();
-            recyclerView.setAdapter(firebaseAdapter);
-            reference.addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    if(dbListFirebase.isEmpty()){
-                        Snackbar.make(v,getResources().getString(R.string.favoribos),Snackbar.LENGTH_LONG).show();
-                    }
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
-
-                }
-            });
-        }
-        else{
+            recyclerView.setAdapter(adapterFirebase);
+        } else {
             favori = new Favorites(v.getContext());
             dbList = favori.getDataFromDB();
-            adapter = new RecyclerAdapter(v.getContext(),dbList,firebaseAuth,reference);
+            adapter = new RecyclerAdapter(v.getContext(), dbList, firebaseAuth, reference);
             recyclerView.setAdapter(adapter);
-            if(dbList.isEmpty()){
-                Snackbar.make(v,getResources().getString(R.string.favoribos),Snackbar.LENGTH_LONG).show();
-            }
-            else{
-                Snackbar.make(v,getResources().getString(R.string.login_message),Snackbar.LENGTH_LONG).show();
+            if (dbList.isEmpty()) {
+                Snackbar.make(v, getResources().getString(R.string.favoribos), Snackbar.LENGTH_LONG).show();
+            } else {
+                Snackbar.make(v, getResources().getString(R.string.login_message), Snackbar.LENGTH_LONG).show();
             }
         }
 
@@ -117,7 +104,7 @@ public class FavoritesFragment extends Fragment {
             @Override
             public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
                 dbListFirebase.add(snapshot.getValue(MovieFirebase.class));
-                adapter.notifyDataSetChanged();
+                adapterFirebase.notifyDataSetChanged();
             }
 
             @Override
@@ -140,39 +127,32 @@ public class FavoritesFragment extends Fragment {
 
             }
         });
-    }
-
-
-    @Override
-    public void onResume() {
-        if (firebaseAuth.getCurrentUser() != null) {
-            reference= FirebaseDatabase.getInstance().getReference("Favoriler").child(Objects.requireNonNull(firebaseAuth.getCurrentUser().getDisplayName()));
-            firebaseAdapter = new FirebaseAdapter(v.getContext(),dbListFirebase,firebaseAuth,reference);
-            getFirebaseData();
-            recyclerView.setAdapter(firebaseAdapter);
-            reference.addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    if(dbListFirebase.isEmpty()){
-                        Snackbar.make(v,getResources().getString(R.string.favoribos),Snackbar.LENGTH_LONG).show();
-                    }
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
-
-                }
-            });
-        }
-        else{
-            if(!dbList.isEmpty()){
-                if(favori.Kontrol(dbList.get(adapter.getSira()).getFilm_id())){
-                    dbList.remove(adapter.getSira());
-                    adapter.notifyDataSetChanged();
-                    adapter.notifyItemRangeChanged(adapter.getSira(),adapter.getItemCount());
+        reference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (dbListFirebase.isEmpty()) {
+                    Snackbar.make(v, getResources().getString(R.string.favoribos), Snackbar.LENGTH_LONG).show();
                 }
             }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    public void onActivityResult(int requestCode) {
+        if (requestCode == 1) {
+            dbList=new ArrayList<>();
+            dbList=favori.getDataFromDB();
+            adapter=new RecyclerAdapter(v.getContext(),dbList,firebaseAuth,reference);
+            recyclerView.swapAdapter(adapter,false);
+        } else if (requestCode == 2) {
+            dbListFirebase=new ArrayList<>();
+            getFirebaseData();
+            adapterFirebase=new FirebaseAdapter("favorites",v.getContext(),dbListFirebase,firebaseAuth,reference);
+            recyclerView.swapAdapter(adapterFirebase,false);
         }
-        super.onResume();
     }
 }

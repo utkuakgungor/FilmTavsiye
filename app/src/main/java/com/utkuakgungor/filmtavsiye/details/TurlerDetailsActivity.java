@@ -34,8 +34,8 @@ import java.util.Objects;
 public class TurlerDetailsActivity extends AppCompatActivity {
 
     private FirebaseAuth firebaseAuth;
-    private String tur,turler;
-    private DatabaseReference reference,referenceFavoriler;
+    private String tur, turler;
+    private DatabaseReference reference, referenceFavoriler;
     private List<MovieFirebase> result;
     private FirebaseAdapter adapter;
     private ImageView imageView;
@@ -51,31 +51,32 @@ public class TurlerDetailsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        firebaseAuth=FirebaseAuth.getInstance();
-        if(firebaseAuth.getCurrentUser()!=null){
-            referenceFavoriler=FirebaseDatabase.getInstance().getReference("Favoriler").child(Objects.requireNonNull(firebaseAuth.getCurrentUser().getDisplayName()));
+        firebaseAuth = FirebaseAuth.getInstance();
+        if (firebaseAuth.getCurrentUser() != null) {
+            referenceFavoriler = FirebaseDatabase.getInstance().getReference("Favoriler").child(Objects.requireNonNull(firebaseAuth.getCurrentUser().getEmail().replace(".", "").replace("#", "").replace("$", "").replace("[", "").replace("]", "")));
         }
         setContentView(R.layout.activity_turlerdetails);
         getIncomingIntent();
         Toolbar toolbar = findViewById(R.id.detay_toolbar);
-        CollapsingToolbarLayout collapsingToolbarLayout=findViewById(R.id.collapsing_toolbar);
-        AppBarLayout appBarLayout=findViewById(R.id.appbar);
+        CollapsingToolbarLayout collapsingToolbarLayout = findViewById(R.id.collapsing_toolbar);
+        AppBarLayout appBarLayout = findViewById(R.id.appbar);
         toolbar.setNavigationIcon(R.drawable.ic_arrow_white);
         toolbar.setNavigationOnClickListener(v -> onBackPressed());
         TextView imageTextview = findViewById(R.id.ImageViewText);
-        imageView=findViewById(R.id.detayImage);
-        FirebaseDatabase database=FirebaseDatabase.getInstance();
-        reference=database.getReference("Filmler");
+        imageView = findViewById(R.id.detayImage);
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        reference = database.getReference("Filmler");
         reference.keepSynced(true);
-        result=new ArrayList<>();
-        RecyclerView recyclerView=findViewById(R.id.firebaselist);
+        result = new ArrayList<>();
+        RecyclerView recyclerView = findViewById(R.id.firebaselist);
         recyclerView.setHasFixedSize(true);
-        final StaggeredGridLayoutManager staggeredGridLayoutManager=new StaggeredGridLayoutManager(2,1);
+        final StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(2, 1);
 
         imageTextview.setText(tur);
         appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
             boolean isShow = true;
             int scrollRange = -1;
+
             @Override
             public void onOffsetChanged(AppBarLayout appBarLayout, int i) {
                 if (scrollRange == -1) {
@@ -84,7 +85,7 @@ public class TurlerDetailsActivity extends AppCompatActivity {
                 if (scrollRange + i == 0) {
                     collapsingToolbarLayout.setTitle(tur);
                     isShow = true;
-                } else if(isShow) {
+                } else if (isShow) {
                     collapsingToolbarLayout.setTitle(" ");
                     isShow = false;
                 }
@@ -93,23 +94,22 @@ public class TurlerDetailsActivity extends AppCompatActivity {
 
         Picasso.get().load(url).into(imageView);
         recyclerView.setLayoutManager(staggeredGridLayoutManager);
-        adapter=new FirebaseAdapter(TurlerDetailsActivity.this,result,firebaseAuth,referenceFavoriler);
+        adapter = new FirebaseAdapter("turler", TurlerDetailsActivity.this, result, firebaseAuth, referenceFavoriler);
         recyclerView.setAdapter(adapter);
         updateList();
 
     }
 
-    private void updateList(){
+    private void updateList() {
         reference.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, String s) {
-                if(Objects.equals(Locale.getDefault().getDisplayLanguage(),"English")){
-                    turler = Objects.requireNonNull(dataSnapshot.getValue(MovieFirebase.class)).getFilm_tur_eng().replace(",","");
+                if (Objects.equals(Locale.getDefault().getDisplayLanguage(), "English")) {
+                    turler = Objects.requireNonNull(dataSnapshot.getValue(MovieFirebase.class)).getFilm_tur_eng().replace(",", "");
+                } else {
+                    turler = Objects.requireNonNull(dataSnapshot.getValue(MovieFirebase.class)).getFilm_tur().replace(",", "");
                 }
-                else{
-                    turler=Objects.requireNonNull(dataSnapshot.getValue(MovieFirebase.class)).getFilm_tur().replace(",","");
-                }
-                if(turler.contains(tur)){
+                if (turler.contains(tur)) {
                     result.add(dataSnapshot.getValue(MovieFirebase.class));
                     adapter.notifyDataSetChanged();
                 }
@@ -143,7 +143,7 @@ public class TurlerDetailsActivity extends AppCompatActivity {
         adapter.notifyItemChanged(adapter.getSira());
     }
 
-    private void getIncomingIntent(){
-        tur=getIntent().getStringExtra("tur");
+    private void getIncomingIntent() {
+        tur = getIntent().getStringExtra("tur");
     }
 }

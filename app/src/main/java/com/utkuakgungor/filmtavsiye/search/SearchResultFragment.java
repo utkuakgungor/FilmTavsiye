@@ -82,7 +82,7 @@ public class SearchResultFragment extends Fragment {
         setHasOptionsMenu(true);
         firebaseAuth = FirebaseAuth.getInstance();
         if (firebaseAuth.getCurrentUser() != null) {
-            referenceFavoriler = FirebaseDatabase.getInstance().getReference("Favoriler").child(Objects.requireNonNull(firebaseAuth.getCurrentUser().getDisplayName()));
+            referenceFavoriler = FirebaseDatabase.getInstance().getReference("Favoriler").child(Objects.requireNonNull(firebaseAuth.getCurrentUser().getEmail().replace(".", "").replace("#", "").replace("$", "").replace("[", "").replace("]", "")));
         }
         sonucyok_Relative = v.findViewById(R.id.aramasonucRelative);
         bundle = getArguments();
@@ -131,7 +131,7 @@ public class SearchResultFragment extends Fragment {
         recyclerView.setHasFixedSize(true);
         StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(2, 1);
 
-        adapter = new FirebaseAdapter(getContext(), result, firebaseAuth, referenceFavoriler);
+        adapter = new FirebaseAdapter("search", getContext(), result, firebaseAuth, referenceFavoriler);
         recyclerView.setLayoutManager(staggeredGridLayoutManager);
         recyclerView.setAdapter(adapter);
 

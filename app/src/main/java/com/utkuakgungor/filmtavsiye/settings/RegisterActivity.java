@@ -6,6 +6,8 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -13,12 +15,18 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.utkuakgungor.filmtavsiye.R;
+import com.utkuakgungor.filmtavsiye.models.MovieFirebase;
 import com.utkuakgungor.filmtavsiye.utils.Favorites;
 import com.utkuakgungor.filmtavsiye.models.Model;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -61,12 +69,52 @@ public class RegisterActivity extends AppCompatActivity {
                                 favorites=new Favorites(this);
                                 list=favorites.getDataFromDB();
                                 if(list.size()>0){
-                                    reference= FirebaseDatabase.getInstance().getReference("Favoriler").child(Objects.requireNonNull(Objects.requireNonNull(mAuth.getCurrentUser()).getDisplayName()));
-                                    for(int i=0;i<list.size();i++){
-                                        String id=reference.push().getKey();
-                                        reference.child(Objects.requireNonNull(id)).setValue(list.get(i));
-                                        favorites.deleteData(list.get(i).getFilm_id());
-                                    }
+                                    List<String> dbList=new ArrayList<>();
+                                    reference=FirebaseDatabase.getInstance().getReference("Favoriler").child(Objects.requireNonNull(mAuth.getCurrentUser().getEmail().replace(".","").replace("#","").replace("$","").replace("[","").replace("]","")));
+                                    reference.addChildEventListener(new ChildEventListener() {
+                                        @Override
+                                        public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                                            dbList.add(snapshot.getValue(MovieFirebase.class).getFilm_id());
+                                        }
+
+                                        @Override
+                                        public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+                                        }
+
+                                        @Override
+                                        public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+
+                                        }
+
+                                        @Override
+                                        public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+                                        }
+
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError error) {
+
+                                        }
+                                    });
+                                    reference.addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                            for(int i=0;i<list.size();i++){
+                                                if(!dbList.contains(list.get(i).getFilm_id())){
+                                                    String id=reference.push().getKey();
+                                                    reference.child(Objects.requireNonNull(id)).setValue(list.get(i));
+                                                    favorites.deleteData(list.get(i).getFilm_id());
+                                                }
+
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError error) {
+
+                                        }
+                                    });
                                 }
                                 progressBar.setVisibility(View.GONE);
                                 Toast.makeText(this, getResources().getString(R.string.text_register_success), Toast.LENGTH_LONG).show();

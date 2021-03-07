@@ -26,6 +26,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 import com.ms.square.android.expandabletextview.ExpandableTextView;
 import com.squareup.picasso.Callback;
@@ -60,7 +61,6 @@ public class OyuncuDetailsActivity extends AppCompatActivity {
     private RequestQueue requestQueue;
     private LinearLayout linearLayout;
     private FirebaseAuth firebaseAuth;
-    private APIPersonMovies data;
 
     public boolean onOptionsItemSelected(MenuItem item) {
         onBackPressed();
@@ -72,7 +72,7 @@ public class OyuncuDetailsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         firebaseAuth = FirebaseAuth.getInstance();
         if (firebaseAuth.getCurrentUser() != null) {
-            referenceFavoriler = FirebaseDatabase.getInstance().getReference("Favoriler").child(Objects.requireNonNull(firebaseAuth.getCurrentUser().getDisplayName()));
+            referenceFavoriler = FirebaseDatabase.getInstance().getReference("Favoriler").child(Objects.requireNonNull(firebaseAuth.getCurrentUser().getEmail().replace(".", "").replace("#", "").replace("$", "").replace("[", "").replace("]", "")));
         }
         setContentView(R.layout.activity_oyuncudetails);
         getIncomingIntent();
@@ -94,21 +94,19 @@ public class OyuncuDetailsActivity extends AppCompatActivity {
         referenceFilmler = FirebaseDatabase.getInstance().getReference("Filmler");
         list = new ArrayList<>();
         date = new StringBuilder();
-        adapter = new FirebaseAdapter(getBaseContext(), list, firebaseAuth, referenceFavoriler);
+        adapter = new FirebaseAdapter("oyuncu", getBaseContext(), list, firebaseAuth, referenceFavoriler);
         StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(2, 1);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(staggeredGridLayoutManager);
         recyclerView.setAdapter(adapter);
-
         jsonSosyal();
         jsonTMDB();
         updateFilmler();
     }
 
     private void jsonTMDB() {
-        String urlBasPerson = "https://api.themoviedb.org/3/person/";
-        String urlSonPerson = "?api_key=" + TMDBApi.getApiKey() + "&language=en-US";
-        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, urlBasPerson + person_id + urlSonPerson, null,
+        String url = "https://api.themoviedb.org/3/person/" + person_id + "?api_key=" + TMDBApi.getApiKey();
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url, null,
                 response -> {
                     try {
                         txt_oyuncuadi.setText(response.getString("name"));
@@ -176,9 +174,8 @@ public class OyuncuDetailsActivity extends AppCompatActivity {
     }
 
     private void jsonSosyal() {
-        String urlBasSosyal = "https://api.themoviedb.org/3/person/";
-        String urlSonSosyal = "/external_ids?api_key=" + TMDBApi.getApiKey() + "&language=en-US";
-        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, urlBasSosyal + person_id + urlSonSosyal, null,
+        String url = "https://api.themoviedb.org/3/person/" + person_id + "/external_ids?api_key=" + TMDBApi.getApiKey();
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url, null,
                 response -> {
                     try {
                         if (Objects.equals(response.getString("twitter_id"), "null") || Objects.equals(response.getString("twitter_id"), "")) {
@@ -228,15 +225,15 @@ public class OyuncuDetailsActivity extends AppCompatActivity {
         String url = "https://api.themoviedb.org/3/person/" + person_id + "/movie_credits?api_key=" + TMDBApi.getApiKey();
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url, null,
                 response -> {
-                        String responseString = response.toString();
-                        Gson gson=new Gson();
-                        data=gson.fromJson(responseString,APIPersonMovies.class);
+                    String responseString = response.toString();
+                    Gson gson = new Gson();
+                    APIPersonMovies data = gson.fromJson(responseString, APIPersonMovies.class);
                     if (secenek.equals("oyuncu")) {
                         referenceFilmler.addChildEventListener(new ChildEventListener() {
                             @Override
                             public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
                                 for (int i = 0; i < data.getCast().size(); i++) {
-                                    if (data.getCast().get(i).getId().equals(Integer.parseInt(Objects.requireNonNull(snapshot.getValue(Movie.class)).getFilm_id()))) {
+                                    if (data.getCast().get(i).getId().equals(Objects.requireNonNull(snapshot.getValue(MovieFirebase.class)).getFilm_id())) {
                                         list.add(snapshot.getValue(MovieFirebase.class));
                                         adapter.notifyDataSetChanged();
                                     }
@@ -268,7 +265,7 @@ public class OyuncuDetailsActivity extends AppCompatActivity {
                             @Override
                             public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
                                 for (int i = 0; i < data.getCast().size(); i++) {
-                                    if (data.getCrew().get(i).getId().equals(Integer.parseInt(Objects.requireNonNull(snapshot.getValue(Movie.class)).getFilm_id()))) {
+                                    if (data.getCrew().get(i).getId().equals(Objects.requireNonNull(snapshot.getValue(MovieFirebase.class)).getFilm_id())) {
                                         list.add(snapshot.getValue(MovieFirebase.class));
                                         adapter.notifyDataSetChanged();
                                     }

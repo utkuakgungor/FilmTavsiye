@@ -28,6 +28,7 @@ import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.NetworkPolicy;
@@ -37,7 +38,9 @@ import com.squareup.picasso.Picasso;
 import com.utkuakgungor.filmtavsiye.models.APIMovie;
 import com.utkuakgungor.filmtavsiye.models.Model;
 import com.utkuakgungor.filmtavsiye.models.Movie;
+import com.utkuakgungor.filmtavsiye.models.MovieFirebase;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
@@ -51,6 +54,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.UserVi
     private int sira;
     private RequestQueue requestQueue;
     private Context context;
+    private List<String> firebaseKeys,firebaseList;
 
     public RecyclerAdapter(Context context, List<Model> list, FirebaseAuth firebaseAuth, DatabaseReference reference) {
         this.list = list;
@@ -58,6 +62,8 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.UserVi
         this.context = context;
         this.reference = reference;
         requestQueue= Volley.newRequestQueue(context);
+        firebaseKeys=new ArrayList<>();
+        firebaseList=new ArrayList<>();
     }
 
     @NonNull
@@ -68,7 +74,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.UserVi
 
     @Override
     public void onBindViewHolder(@NonNull final UserViewHolder holder, final int position) {
-        holder.setIsRecyclable(false);
         String url="https://image.tmdb.org/t/p/original";
         String requestUrl = "https://api.themoviedb.org/3/movie/"+list.get(position).getFilm_id()+"?api_key="+ TMDBApi.getApiKey() +"&language=en-US";
         JsonObjectRequest request=new JsonObjectRequest(Request.Method.GET, requestUrl, null,
@@ -101,9 +106,8 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.UserVi
                                     reference.addChildEventListener(new ChildEventListener() {
                                         @Override
                                         public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                                            if (Objects.requireNonNull(snapshot.getValue(Movie.class)).getFilm_id().equals(list.get(position).getFilm_id())) {
-                                                holder.txt_fav.setImageResource(R.drawable.ic_favorite_ekli);
-                                            }
+                                            firebaseList.add(snapshot.getValue(MovieFirebase.class).getFilm_id());
+                                            firebaseKeys.add(snapshot.getKey());
                                         }
 
                                         @Override
@@ -126,6 +130,19 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.UserVi
 
                                         }
                                     });
+                                    reference.addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                            if(firebaseList.contains(list.get(position).getFilm_id())) {
+                                                holder.txt_fav.setImageResource(R.drawable.ic_favorite_ekli);
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError error) {
+
+                                        }
+                                    });
                                 } else {
                                     if (!favorites.Kontrol(list.get(position).getFilm_id())) {
                                         holder.txt_fav.setImageResource(R.drawable.ic_favorite_ekli);
@@ -133,14 +150,13 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.UserVi
                                 }
                                 holder.txt_fav.setOnClickListener(v -> {
                                     if (firebaseAuth.getCurrentUser() != null) {
-                                        final int[] movieNumber = {0};
+                                        firebaseList=new ArrayList<>();
+                                        firebaseKeys=new ArrayList<>();
                                         reference.addChildEventListener(new ChildEventListener() {
                                             @Override
                                             public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                                                if(Objects.requireNonNull(snapshot.getValue(Movie.class)).getFilm_id().equals(list.get(position).getFilm_id())){
-                                                    reference.child(Objects.requireNonNull(snapshot.getKey())).removeValue();
-                                                    movieNumber[0]++;
-                                                }
+                                                firebaseList.add(snapshot.getValue(MovieFirebase.class).getFilm_id());
+                                                firebaseKeys.add(snapshot.getKey());
                                             }
 
                                             @Override
@@ -163,10 +179,34 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.UserVi
 
                                             }
                                         });
-                                        if(movieNumber[0] ==0){
-                                            String id=reference.push().getKey();
-                                            reference.child(Objects.requireNonNull(id)).setValue(list.get(position));
-                                        }
+                                        reference.addListenerForSingleValueEvent(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                                if(firebaseList.contains(list.get(position).getFilm_id())){
+                                                    reference.child(firebaseKeys.get(firebaseList.indexOf(list.get(position).getFilm_id()))).removeValue();
+                                                    holder.txt_fav.setImageResource(R.drawable.ic_favorite);
+                                                    Snackbar.make(v, v.getResources().getString(R.string.favoricikti), Snackbar.LENGTH_LONG).show();
+                                                    list.remove(position);
+                                                    notifyDataSetChanged();
+                                                }
+                                                else{
+                                                    String id =reference.push().getKey();
+                                                    MovieFirebase movieFirebase=new MovieFirebase();
+                                                    movieFirebase.setFilm_id(list.get(position).getFilm_id());
+                                                    movieFirebase.setFilm_tur_eng(list.get(position).getFilm_tur_eng());
+                                                    movieFirebase.setFilm_tur(list.get(position).getFilm_tur());
+                                                    movieFirebase.setFilm_sinif(list.get(position).getFilm_sinif());
+                                                    reference.child(id).setValue(movieFirebase);
+                                                    Snackbar.make(v, v.getResources().getString(R.string.favoriekle), Snackbar.LENGTH_LONG).show();
+                                                    holder.txt_fav.setImageResource(R.drawable.ic_favorite_ekli);
+                                                }
+                                            }
+
+                                            @Override
+                                            public void onCancelled(@NonNull DatabaseError error) {
+
+                                            }
+                                        });
                                     } else {
                                         if (favorites.Kontrol(list.get(position).getFilm_id())) {
                                             favorites.ekleModel(list.get(position));
@@ -204,7 +244,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.UserVi
                                     pairs[2] = new Pair<View, String>(holder.txt_film_puani, "cardPuan");
                                     ActivityOptions activityOptions = ActivityOptions.
                                             makeSceneTransitionAnimation((Activity) v.getContext(), pairs);
-                                    v.getContext().startActivity(intent, activityOptions.toBundle());
+                                    ((Activity) context).startActivityForResult(intent,1, activityOptions.toBundle());
                                 });
                             }, Throwable::printStackTrace);
                     requestQueue.add(requestTR);

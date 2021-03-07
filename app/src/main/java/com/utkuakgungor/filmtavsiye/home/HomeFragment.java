@@ -61,14 +61,14 @@ public class HomeFragment extends Fragment {
         reference= FirebaseDatabase.getInstance().getReference("Filmler");
         firebaseAuth=FirebaseAuth.getInstance();
         if(firebaseAuth.getCurrentUser()!=null){
-            referenceFavoriler=FirebaseDatabase.getInstance().getReference("Favoriler").child(Objects.requireNonNull(firebaseAuth.getCurrentUser().getDisplayName()));
+            referenceFavoriler=FirebaseDatabase.getInstance().getReference("Favoriler").child(Objects.requireNonNull(firebaseAuth.getCurrentUser().getEmail().replace(".","").replace("#","").replace("$","").replace("[","").replace("]","")));
         }
         reference.keepSynced(true);
         result =new ArrayList<>();
         final RecyclerView recyclerView = v.findViewById(R.id.firebaselist);
         recyclerView.setHasFixedSize(true);
         StaggeredGridLayoutManager staggeredGridLayoutManager=new StaggeredGridLayoutManager(2,1);
-        adapter =new FirebaseAdapter(v.getContext(),result,firebaseAuth,referenceFavoriler);
+        adapter =new FirebaseAdapter("home",v.getContext(),result,firebaseAuth,referenceFavoriler);
         recyclerView.setLayoutManager(staggeredGridLayoutManager);
         recyclerView.setAdapter(adapter);
         updateList();

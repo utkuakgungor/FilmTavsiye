@@ -68,9 +68,9 @@ public class Favorites extends SQLiteOpenHelper {
             do {
                 Model model = new Model();
                 model.setFilm_id(cursor.getString(1));
-                model.setFilm_tur(cursor.getString(12));
-                model.setFilm_tur_eng(cursor.getString(13));
-                model.setFilm_sinif(cursor.getString(15));
+                model.setFilm_tur(cursor.getString(2));
+                model.setFilm_tur_eng(cursor.getString(3));
+                model.setFilm_sinif(cursor.getString(4));
                 modelList.add(model);
             }while (cursor.moveToNext());
         }

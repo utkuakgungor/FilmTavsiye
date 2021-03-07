@@ -33,20 +33,18 @@ import org.json.JSONException;
 
 public class CustomDialogClass extends AppCompatDialogFragment {
 
-    private APIMovieCast dataCast;
-
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         LayoutInflater layoutInflater = Objects.requireNonNull(getActivity()).getLayoutInflater();
         View view = layoutInflater.inflate(R.layout.layout_cast,null);
         Bundle bundle=getArguments();
-        dataCast= (APIMovieCast) Objects.requireNonNull(bundle).getSerializable("cast");
+        APIMovieCast dataCast= (APIMovieCast) Objects.requireNonNull(bundle).getSerializable("cast");
         List<Oyuncu> oyuncuList = new ArrayList<>();
-        for(int i=0;i<dataCast.getMovieCast().size();i++){
+        for(int i = 0; i< Objects.requireNonNull(dataCast).getMovieCast().size(); i++){
             Oyuncu oyuncu = new Oyuncu();
             oyuncu.setOyuncuAdi(dataCast.getMovieCast().get(i).getName());
-            oyuncu.setOyuncuID(dataCast.getMovieCast().get(i).getId().toString());
+            oyuncu.setOyuncuID(dataCast.getMovieCast().get(i).getId());
             oyuncu.setOyuncuResim(dataCast.getMovieCast().get(i).getProfilePath());
             oyuncuList.add(oyuncu);
         }

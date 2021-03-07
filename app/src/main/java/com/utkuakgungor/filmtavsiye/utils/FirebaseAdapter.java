@@ -28,6 +28,7 @@ import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.NetworkPolicy;
@@ -37,6 +38,7 @@ import com.utkuakgungor.filmtavsiye.R;
 import com.utkuakgungor.filmtavsiye.models.APIMovie;
 import com.utkuakgungor.filmtavsiye.models.MovieFirebase;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -47,14 +49,19 @@ public class FirebaseAdapter extends RecyclerView.Adapter<FirebaseAdapter.UserVi
     private List<MovieFirebase> list;
     private int sira;
     private RequestQueue requestQueue;
+    private List<String> firebaseList, firebaseKeys;
     private Context context;
+    private String fragmentName;
 
-    public FirebaseAdapter(Context context, List<MovieFirebase> list, FirebaseAuth firebaseAuth, DatabaseReference reference) {
+    public FirebaseAdapter(String fragmentName,Context context, List<MovieFirebase> list, FirebaseAuth firebaseAuth, DatabaseReference reference) {
         this.list = list;
         this.reference = reference;
         this.firebaseAuth = firebaseAuth;
         this.context = context;
-        requestQueue= Volley.newRequestQueue(context);
+        this.fragmentName=fragmentName;
+        requestQueue = Volley.newRequestQueue(context);
+        firebaseKeys = new ArrayList<>();
+        firebaseList = new ArrayList<>();
     }
 
     @NonNull
@@ -65,20 +72,19 @@ public class FirebaseAdapter extends RecyclerView.Adapter<FirebaseAdapter.UserVi
 
     @Override
     public void onBindViewHolder(@NonNull final UserViewHolder holder, final int position) {
-        holder.setIsRecyclable(true);
-        String url="https://image.tmdb.org/t/p/original";
-        String requestUrl = "https://api.themoviedb.org/3/movie/"+list.get(position).getFilm_id()+"?api_key="+ TMDBApi.getApiKey() +"&language=en-US";
-        JsonObjectRequest request=new JsonObjectRequest(Request.Method.GET, requestUrl, null,
+        String url = "https://image.tmdb.org/t/p/original";
+        String requestUrl = "https://api.themoviedb.org/3/movie/" + list.get(position).getFilm_id() + "?api_key=" + TMDBApi.getApiKey() + "&language=en-US";
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, requestUrl, null,
                 response -> {
-                    String  jsonString =response.toString();
+                    String jsonString = response.toString();
                     Gson gson = new Gson();
                     APIMovie data = gson.fromJson(jsonString, APIMovie.class);
-                    String requestUrlTR = "https://api.themoviedb.org/3/movie/"+list.get(position).getFilm_id()+"?api_key="+ TMDBApi.getApiKey() +"&language=tr-TR";
-                    JsonObjectRequest requestTR=new JsonObjectRequest(Request.Method.GET, requestUrlTR, null,
+                    String requestUrlTR = "https://api.themoviedb.org/3/movie/" + list.get(position).getFilm_id() + "?api_key=" + TMDBApi.getApiKey() + "&language=tr-TR";
+                    JsonObjectRequest requestTR = new JsonObjectRequest(Request.Method.GET, requestUrlTR, null,
                             responseTR -> {
-                                String jsonStringTR =responseTR.toString();
+                                String jsonStringTR = responseTR.toString();
                                 Gson gsonTR = new Gson();
-                                APIMovie dataTR=gsonTR.fromJson(jsonStringTR, APIMovie.class);
+                                APIMovie dataTR = gsonTR.fromJson(jsonStringTR, APIMovie.class);
                                 holder.txt_film_adi.setText(data.getTitle());
                                 holder.txt_film_puani.setText(data.getVoteAverage());
                                 final Favorites favorites = new Favorites(context);
@@ -87,9 +93,8 @@ public class FirebaseAdapter extends RecyclerView.Adapter<FirebaseAdapter.UserVi
                                     reference.addChildEventListener(new ChildEventListener() {
                                         @Override
                                         public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                                            if (Objects.requireNonNull(snapshot.getValue(MovieFirebase.class)).getFilm_id().equals(list.get(position).getFilm_id())) {
-                                                holder.txt_fav.setImageResource(R.drawable.ic_favorite_ekli);
-                                            }
+                                            firebaseList.add(snapshot.getValue(MovieFirebase.class).getFilm_id());
+                                            firebaseKeys.add(snapshot.getKey());
                                         }
 
                                         @Override
@@ -112,13 +117,25 @@ public class FirebaseAdapter extends RecyclerView.Adapter<FirebaseAdapter.UserVi
 
                                         }
                                     });
+                                    reference.addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                            if (firebaseList.contains(list.get(position).getFilm_id())) {
+                                                holder.txt_fav.setImageResource(R.drawable.ic_favorite_ekli);
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError error) {
+
+                                        }
+                                    });
                                 } else {
                                     if (!favorites.Kontrol(list.get(position).getFilm_id())) {
                                         holder.txt_fav.setImageResource(R.drawable.ic_favorite_ekli);
                                     }
                                 }
-
-                                Picasso.get().load(url+data.getPosterPath()).networkPolicy(NetworkPolicy.OFFLINE).into(holder.txt_image, new Callback() {
+                                Picasso.get().load(url + data.getPosterPath()).networkPolicy(NetworkPolicy.OFFLINE).into(holder.txt_image, new Callback() {
                                     @Override
                                     public void onSuccess() {
 
@@ -126,19 +143,18 @@ public class FirebaseAdapter extends RecyclerView.Adapter<FirebaseAdapter.UserVi
 
                                     @Override
                                     public void onError(Exception e) {
-                                        Picasso.get().load(url+data.getPosterPath()).into(holder.txt_image);
+                                        Picasso.get().load(url + data.getPosterPath()).into(holder.txt_image);
                                     }
                                 });
                                 holder.txt_fav.setOnClickListener(v -> {
                                     if (firebaseAuth.getCurrentUser() != null) {
-                                        final int[] movieNumber = {0};
+                                        firebaseList = new ArrayList<>();
+                                        firebaseKeys = new ArrayList<>();
                                         reference.addChildEventListener(new ChildEventListener() {
                                             @Override
                                             public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                                                if(Objects.requireNonNull(snapshot.getValue(MovieFirebase.class)).getFilm_id().equals(list.get(position).getFilm_id())){
-                                                    reference.child(Objects.requireNonNull(snapshot.getKey())).removeValue();
-                                                    movieNumber[0]++;
-                                                }
+                                                firebaseList.add(snapshot.getValue(MovieFirebase.class).getFilm_id());
+                                                firebaseKeys.add(snapshot.getKey());
                                             }
 
                                             @Override
@@ -161,10 +177,31 @@ public class FirebaseAdapter extends RecyclerView.Adapter<FirebaseAdapter.UserVi
 
                                             }
                                         });
-                                        if(movieNumber[0] ==0){
-                                            String id=reference.push().getKey();
-                                            reference.child(Objects.requireNonNull(id)).setValue(list.get(position));
-                                        }
+                                        reference.addListenerForSingleValueEvent(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                                if (firebaseList.contains(list.get(position).getFilm_id())) {
+                                                    reference.child(firebaseKeys.get(firebaseList.indexOf(list.get(position).getFilm_id()))).removeValue();
+                                                    holder.txt_fav.setImageResource(R.drawable.ic_favorite);
+                                                    if(fragmentName.equals("favorites")){
+                                                        list.remove(position);
+                                                        notifyDataSetChanged();
+                                                    }
+                                                    Snackbar.make(v, v.getResources().getString(R.string.favoricikti), Snackbar.LENGTH_LONG).show();
+                                                } else {
+                                                    String id = reference.push().getKey();
+                                                    MovieFirebase movieFirebase = list.get(position);
+                                                    reference.child(id).setValue(movieFirebase);
+                                                    Snackbar.make(v, v.getResources().getString(R.string.favoriekle), Snackbar.LENGTH_LONG).show();
+                                                    holder.txt_fav.setImageResource(R.drawable.ic_favorite_ekli);
+                                                }
+                                            }
+
+                                            @Override
+                                            public void onCancelled(@NonNull DatabaseError error) {
+
+                                            }
+                                        });
                                     } else {
                                         if (favorites.Kontrol(list.get(position).getFilm_id())) {
                                             favorites.ekleFirebase(list.get(position));
@@ -173,25 +210,23 @@ public class FirebaseAdapter extends RecyclerView.Adapter<FirebaseAdapter.UserVi
                                             holder.txt_fav.setImageResource(R.drawable.ic_favorite_ekli);
                                         } else {
                                             favorites.deleteData(list.get(position).getFilm_id());
-                                            list.remove(position);
                                             holder.txt_fav.setImageResource(R.drawable.ic_favorite);
                                             Snackbar.make(v, v.getResources().getString(R.string.favoricikti), Snackbar.LENGTH_LONG).show();
-                                            notifyDataSetChanged();
                                         }
                                     }
                                 });
                                 holder.txt_layout.setOnClickListener(v -> {
                                     Intent intent = new Intent(v.getContext(), DetailsActivity.class);
                                     sira = position;
-                                    intent.putExtra("id",list.get(position).getFilm_id());
+                                    intent.putExtra("id", list.get(position).getFilm_id());
                                     intent.putExtra("ad", data.getTitle());
                                     intent.putExtra("yil", data.getReleaseDate().split("-")[0]);
                                     intent.putExtra("puan", data.getVoteAverage().toString());
-                                    intent.putExtra("image", url+data.getPosterPath());
+                                    intent.putExtra("image", url + data.getPosterPath());
                                     intent.putExtra("ozet", dataTR.getOverview());
-                                    intent.putExtra("sure", Integer.parseInt(data.getRuntime())/60+" saat "+Integer.parseInt(data.getRuntime())%60+" dakika");
+                                    intent.putExtra("sure", Integer.parseInt(data.getRuntime()) / 60 + " saat " + Integer.parseInt(data.getRuntime()) % 60 + " dakika");
                                     intent.putExtra("ozet_eng", data.getOverview());
-                                    intent.putExtra("sure_eng", Integer.parseInt(data.getRuntime())/60+" hours "+Integer.parseInt(data.getRuntime())%60+" minutes");
+                                    intent.putExtra("sure_eng", Integer.parseInt(data.getRuntime()) / 60 + " hours " + Integer.parseInt(data.getRuntime()) % 60 + " minutes");
                                     intent.putExtra("tur", list.get(position).getFilm_tur());
                                     intent.putExtra("tur_eng", list.get(position).getFilm_tur_eng());
                                     intent.putExtra("sinif", list.get(position).getFilm_sinif());
@@ -201,7 +236,7 @@ public class FirebaseAdapter extends RecyclerView.Adapter<FirebaseAdapter.UserVi
                                     pairs[2] = new Pair<View, String>(holder.txt_film_puani, "cardPuan");
                                     ActivityOptions activityOptions = ActivityOptions.
                                             makeSceneTransitionAnimation((Activity) v.getContext(), pairs);
-                                    v.getContext().startActivity(intent, activityOptions.toBundle());
+                                    ((Activity) context).startActivityForResult(intent,2, activityOptions.toBundle());
                                 });
                             }, Throwable::printStackTrace);
                     requestQueue.add(requestTR);

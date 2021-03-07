@@ -73,6 +73,7 @@ public class OyuncularAdapter extends RecyclerView.Adapter<OyuncularAdapter.View
             pairs[0] = new Pair<View, String>(holder.txt_image, "picture");
             pairs[1] = new Pair<View, String>(holder.txt_oyuncu, "text");
             intent.putExtra("person_id", list.get(position).getOyuncuID());
+            intent.putExtra("secenek","oyuncu");
             ActivityOptions activityOptions = ActivityOptions.makeSceneTransitionAnimation((Activity) v.getContext(), pairs);
             v.getContext().startActivity(intent, activityOptions.toBundle());
         });
