@@ -4,8 +4,15 @@
     package="com.utkuakgungor.filmtavsiye">
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         tools:ignore="ScopedStorage" />
+
+    <queries>
+        <intent>
+            <action android:name="com.google.android.youtube.api.service.START" />
+        </intent>
+    </queries>
 
     <application
         android:name=".utils.FilmTavsiye"
@@ -22,6 +29,7 @@
         <meta-data
             android:name="firebase_performance_logcat_enabled"
             android:value="true" />
+
         <activity
             android:name=".main.MainActivity"
             android:hardwareAccelerated="true"
@@ -33,49 +41,60 @@
             </intent-filter>
         </activity>
         <activity
-            android:theme="@style/AppThemeNoActionBar"
             android:name=".details.DetailsActivity"
+            android:hardwareAccelerated="true"
             android:parentActivityName=".main.MainActivity"
-            android:hardwareAccelerated="true"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait"
+            android:theme="@style/AppThemeNoActionBar" />
         <activity
-            android:theme="@style/AppThemeNoActionBar"
-            android:name=".details.ImageDetails"
+            android:name=".details.DetailsCastActivity"
+            android:hardwareAccelerated="true"
             android:parentActivityName=".details.DetailsActivity"
-            android:hardwareAccelerated="true"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait"
+            android:theme="@style/AppThemeNoActionBar" />
         <activity
-            android:theme="@style/AppThemeNoActionBar"
+            android:name=".details.ImageDetailsActivity"
+            android:hardwareAccelerated="true"
+            android:parentActivityName=".details.DetailsActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppThemeNoActionBar" />
+        <activity
             android:name=".details.TurlerDetailsActivity"
             android:hardwareAccelerated="true"
             android:parentActivityName=".details.DetailsActivity"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:theme="@style/AppThemeNoActionBar" />
         <activity
-            android:theme="@style/AppThemeNoActionBar"
             android:name=".settings.WebViewActivity"
-            android:parentActivityName=".settings.SettingsActivity"
             android:hardwareAccelerated="true"
-            android:screenOrientation="portrait"/>
+            android:parentActivityName=".settings.SettingsActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppThemeNoActionBar" />
         <activity
             android:name=".details.OyuncuDetailsActivity"
             android:hardwareAccelerated="true"
             android:parentActivityName=".details.DetailsActivity"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait"
+            android:theme="@style/AppThemeNoActionBar" />
         <activity
             android:name=".settings.SettingsActivity"
             android:hardwareAccelerated="true"
             android:parentActivityName=".main.MainActivity"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".main.MainActivity" />
+        </activity>
         <activity
             android:name=".settings.LoginActivity"
             android:hardwareAccelerated="true"
             android:parentActivityName=".settings.SettingsActivity"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".settings.RegisterActivity"
             android:hardwareAccelerated="true"
             android:parentActivityName=".settings.LoginActivity"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>

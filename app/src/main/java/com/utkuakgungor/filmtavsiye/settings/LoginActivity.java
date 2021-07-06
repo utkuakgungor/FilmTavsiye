@@ -53,6 +53,14 @@ public class LoginActivity extends AppCompatActivity {
     private List<Model> list;
 
     @Override
+    public void onBackPressed() {
+        Intent intent=new Intent(this,SettingsActivity.class);
+        startActivity(intent);
+        finish();
+        super.onBackPressed();
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
@@ -126,8 +134,8 @@ public class LoginActivity extends AppCompatActivity {
                             }
                             progressBar.setVisibility(View.GONE);
                             Intent settingsInten = new Intent(this, SettingsActivity.class);
-                            settingsInten.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                             startActivity(settingsInten);
+                            finish();
                         }).addOnFailureListener(e -> {
                     progressBar.setVisibility(View.GONE);
                     Snackbar.make(v12, getResources().getString(R.string.text_username_password), Snackbar.LENGTH_LONG).show();
@@ -138,6 +146,7 @@ public class LoginActivity extends AppCompatActivity {
         registerButton.setOnClickListener(v13 -> {
             Intent registerActivity = new Intent(this, RegisterActivity.class);
             startActivity(registerActivity);
+            finish();
         });
         twitterButton.setOnClickListener(v1 -> {
             progressBar.setVisibility(View.VISIBLE);
@@ -217,8 +226,8 @@ public class LoginActivity extends AppCompatActivity {
                         }
                         progressBar.setVisibility(View.GONE);
                         Intent settingsInten = new Intent(this, SettingsActivity.class);
-                        settingsInten.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         startActivity(settingsInten);
+                        finish();
                     })
                     .addOnFailureListener(e -> {
                         progressBar.setVisibility(View.GONE);
@@ -290,8 +299,8 @@ public class LoginActivity extends AppCompatActivity {
                                 }
                                 progressBar.setVisibility(View.GONE);
                                 Intent settingsInten = new Intent(this, SettingsActivity.class);
-                                settingsInten.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                 startActivity(settingsInten);
+                                finish();
                             })
                     .addOnFailureListener(e -> {
                         progressBar.setVisibility(View.GONE);
@@ -390,8 +399,8 @@ public class LoginActivity extends AppCompatActivity {
                     }
                     progressBar.setVisibility(View.GONE);
                     Intent settingsInten = new Intent(coordinatorLayout.getContext(), SettingsActivity.class);
-                    settingsInten.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(settingsInten);
+                    finish();
                 })
                 .addOnFailureListener(e -> {
                     progressBar.setVisibility(View.GONE);

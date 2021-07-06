@@ -14,9 +14,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.utkuakgungor.filmtavsiye.R;
+import com.utkuakgungor.filmtavsiye.details.DetailsActivity;
+import com.utkuakgungor.filmtavsiye.details.TurlerDetailsActivity;
+import com.utkuakgungor.filmtavsiye.main.MainActivity;
 
 public class SettingsActivity extends AppCompatActivity {
 
@@ -46,11 +50,20 @@ public class SettingsActivity extends AppCompatActivity {
             loginButton.setOnClickListener(v -> {
                 Intent loginIntent = new Intent(v.getContext(), LoginActivity.class);
                 startActivity(loginIntent);
+                finish();
             });
         } else {
             logoutButton.setVisibility(View.VISIBLE);
             logoutButton.setOnClickListener(v -> {
                 firebaseAuth.signOut();
+                Snackbar.make(v, v.getResources().getString(R.string.text_logout_success), Snackbar.LENGTH_LONG).show();
+                loginButton.setVisibility(View.VISIBLE);
+                logoutButton.setVisibility(View.GONE);
+                loginButton.setOnClickListener(v1 -> {
+                    Intent loginIntent = new Intent(v1.getContext(), LoginActivity.class);
+                    startActivity(loginIntent);
+                    finish();
+                });
             });
         }
 

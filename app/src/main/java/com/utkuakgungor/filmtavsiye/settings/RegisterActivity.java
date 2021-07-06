@@ -39,6 +39,14 @@ public class RegisterActivity extends AppCompatActivity {
     private ProgressBar progressBar;
 
     @Override
+    public void onBackPressed() {
+        Intent intent=new Intent(this,LoginActivity.class);
+        startActivity(intent);
+        finish();
+        super.onBackPressed();
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
@@ -119,8 +127,8 @@ public class RegisterActivity extends AppCompatActivity {
                                 progressBar.setVisibility(View.GONE);
                                 Toast.makeText(this, getResources().getString(R.string.text_register_success), Toast.LENGTH_LONG).show();
                                 Intent settingsIntent = new Intent(this, SettingsActivity.class);
-                                settingsIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                 startActivity(settingsIntent);
+                                finish();
                             } else {
                                 Snackbar.make(v1, getResources().getString(R.string.text_register_error), Snackbar.LENGTH_LONG).show();
                             }

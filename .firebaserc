@@ -1,5 +1,6 @@
 {
   "projects": {
-    "default": "filmtavsiye-dbc33"
+    "movie-suggestion-80e2a": "movie-suggestion-80e2a",
+    "default": "movie-suggestion-80e2a"
   }
 }

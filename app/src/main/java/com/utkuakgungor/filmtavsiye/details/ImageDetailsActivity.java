@@ -6,10 +6,8 @@ import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.TextView;
 
 import com.github.chrisbanes.photoview.PhotoView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -27,10 +25,9 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 
-public class ImageDetails extends AppCompatActivity {
+public class ImageDetailsActivity extends AppCompatActivity {
 
     private CoordinatorLayout coordinatorLayout;
     private static final int PERMISSION_REQUEST_CODE = 1000;
@@ -82,7 +79,7 @@ public class ImageDetails extends AppCompatActivity {
         fab.setImageDrawable(willBeWhite);
         back_fab.setOnClickListener(v -> onBackPressed());
         fab.setOnClickListener(v -> {
-            if(ActivityCompat.checkSelfPermission(ImageDetails.this,Manifest.permission.WRITE_EXTERNAL_STORAGE)!=PackageManager.PERMISSION_GRANTED){
+            if(ActivityCompat.checkSelfPermission(ImageDetailsActivity.this,Manifest.permission.WRITE_EXTERNAL_STORAGE)!=PackageManager.PERMISSION_GRANTED){
                 requestPermissions(new String[]{
                         Manifest.permission.WRITE_EXTERNAL_STORAGE
                 },PERMISSION_REQUEST_CODE);

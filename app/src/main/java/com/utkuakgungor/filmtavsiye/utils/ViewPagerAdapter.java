@@ -14,7 +14,7 @@ import com.squareup.picasso.Callback;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 import com.utkuakgungor.filmtavsiye.R;
-import com.utkuakgungor.filmtavsiye.details.ImageDetails;
+import com.utkuakgungor.filmtavsiye.details.ImageDetailsActivity;
 
 import androidx.annotation.NonNull;
 import androidx.viewpager.widget.PagerAdapter;
@@ -60,7 +60,7 @@ public class ViewPagerAdapter extends PagerAdapter {
             }
         });
         imageView.setOnClickListener(v -> {
-            Intent resimIntent = new Intent(context, ImageDetails.class);
+            Intent resimIntent = new Intent(context, ImageDetailsActivity.class);
             resimIntent.putExtra("image", list.get(position));
             Pair[] pair = new Pair[1];
             pair[0] = new Pair<View, String>(imageView, "cardPicture");

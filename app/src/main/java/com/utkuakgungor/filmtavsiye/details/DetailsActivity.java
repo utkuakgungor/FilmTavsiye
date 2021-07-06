@@ -2,6 +2,8 @@ package com.utkuakgungor.filmtavsiye.details;
 
 import android.app.ActivityOptions;
 import android.content.Intent;
+import android.content.res.ColorStateList;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.util.Pair;
 import android.graphics.PorterDuff;
@@ -15,7 +17,6 @@ import com.android.volley.toolbox.Volley;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.viewpager.widget.ViewPager;
@@ -38,6 +39,10 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.google.android.material.snackbar.Snackbar;
+import com.google.android.youtube.player.YouTubeBaseActivity;
+import com.google.android.youtube.player.YouTubeInitializationResult;
+import com.google.android.youtube.player.YouTubePlayer;
+import com.google.android.youtube.player.YouTubePlayerView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -47,9 +52,6 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
-import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer;
-import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener;
-import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
@@ -69,7 +71,7 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.Arrays;
 
-public class DetailsActivity extends AppCompatActivity {
+public class DetailsActivity extends YouTubeBaseActivity {
 
     private FirebaseAuth firebaseAuth;
     private Movie movie;
@@ -79,20 +81,20 @@ public class DetailsActivity extends AppCompatActivity {
     private CircleImageView image_yonetmen, oyuncuresim1, oyuncuresim2, oyuncuresim3, oyuncuresim4, oyuncuresim5, oyuncuresim6;
     private Favorites favorites;
     private TextView textYonetmen;
-    private String yonetmenID,oyuncu1ID,oyuncu2ID,oyuncu3ID,oyuncu4ID,oyuncu5ID,oyuncu6ID;
+    private String yonetmenID, oyuncu1ID, oyuncu2ID, oyuncu3ID, oyuncu4ID, oyuncu5ID, oyuncu6ID;
     private FloatingActionButton fab;
     private List<String> sinifList, resimlerList;
-    private List<String> firebaseList,firebaseKeys;
+    private List<String> firebaseList, firebaseKeys;
     private DatabaseReference reference_favoriler;
     private MaterialButton diger;
     private int dotscount;
     private ImageView[] dots;
-    private int sayac = 0;
+    private int sayac;
     private ViewPager viewPager;
-    private YouTubePlayerView youTubePlayerView;
-    private RelativeLayout yonetmen_relative,oyuncu1_relative,oyuncu2_relative,oyuncu3_relative,oyuncu4_relative,oyuncu5_relative,oyuncu6_relative;
+    private RelativeLayout yonetmen_relative, oyuncu1_relative, oyuncu2_relative, oyuncu3_relative, oyuncu4_relative, oyuncu5_relative, oyuncu6_relative;
     private LinearLayout linearLayout;
-    private Pair[] pairs = new Pair[2];
+    private Pair[] pairs;
+    private YouTubePlayerView youTubePlayerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,17 +102,18 @@ public class DetailsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_detay);
         firebaseAuth = FirebaseAuth.getInstance();
         if (firebaseAuth.getCurrentUser() != null) {
-            reference_favoriler=FirebaseDatabase.getInstance().getReference("Favoriler").child(Objects.requireNonNull(firebaseAuth.getCurrentUser().getEmail().replace(".","").replace("#","").replace("$","").replace("[","").replace("]","")));
+            reference_favoriler = FirebaseDatabase.getInstance().getReference("Favoriler").child(Objects.requireNonNull(firebaseAuth.getCurrentUser().getEmail().replace(".", "").replace("#", "").replace("$", "").replace("[", "").replace("]", "")));
         }
         movie = new Movie();
         resimlerList = new ArrayList<>();
         sinifList = new ArrayList<>();
+        pairs = new Pair[2];
+        sayac = 0;
         getIncomingIntent();
         favorites = new Favorites(DetailsActivity.this);
         image_yonetmen = findViewById(R.id.detayyonetmenresim);
-        youTubePlayerView = findViewById(R.id.detay_youtube_player_view);
-        getLifecycle().addObserver(youTubePlayerView);
         TextView textFilmYili = findViewById(R.id.detayYilDegisken);
+        youTubePlayerView = findViewById(R.id.detay_youtube_player_view);
         TextView textPuan = findViewById(R.id.detayPuan);
         TextView textOzet = findViewById(R.id.detayOzet);
         linearLayout = findViewById(R.id.detay_dots);
@@ -141,8 +144,8 @@ public class DetailsActivity extends AppCompatActivity {
         oyuncuisim6 = findViewById(R.id.detayoyuncu6);
         oyuncuresim1 = findViewById(R.id.detayoyuncuresim1);
         oyuncuresim2 = findViewById(R.id.detayoyuncuresim2);
-        firebaseList=new ArrayList<>();
-        firebaseKeys=new ArrayList<>();
+        firebaseList = new ArrayList<>();
+        firebaseKeys = new ArrayList<>();
         oyuncuresim3 = findViewById(R.id.detayoyuncuresim3);
         oyuncuresim4 = findViewById(R.id.detayoyuncuresim4);
         oyuncuresim5 = findViewById(R.id.detayoyuncuresim5);
@@ -165,6 +168,9 @@ public class DetailsActivity extends AppCompatActivity {
             if (Objects.equals(Locale.getDefault().getDisplayLanguage(), "Türkçe")) {
                 final Chip chip = new Chip(chipGroup.getContext());
                 chip.setText(turler[sayac]);
+                if ((getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES) {
+                    chip.setChipStrokeColorResource(R.color.colorWhite);
+                }
                 chip.setTextSize(14);
                 chip.setOnClickListener(v -> {
                     Intent turactivity = new Intent(DetailsActivity.this, TurlerDetailsActivity.class);
@@ -176,6 +182,9 @@ public class DetailsActivity extends AppCompatActivity {
             } else {
                 final Chip chip = new Chip(chipGroup.getContext());
                 chip.setText(turler_eng[sayac]);
+                if ((getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES) {
+                    chip.setChipStrokeColorResource(R.color.colorWhite);
+                }
                 chip.setTextSize(14);
                 chip.setOnClickListener(v -> {
                     Intent turactivity = new Intent(DetailsActivity.this, TurlerDetailsActivity.class);
@@ -224,7 +233,7 @@ public class DetailsActivity extends AppCompatActivity {
             reference_favoriler.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    if(firebaseList.contains(movie.getFilm_id())){
+                    if (firebaseList.contains(movie.getFilm_id())) {
                         Drawable favFabFirebase = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_favorite_ekli, getTheme());
                         Drawable whiteFavFirebase = Objects.requireNonNull(favFabFirebase.getConstantState()).newDrawable();
                         whiteFavFirebase.mutate().setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_ATOP);
@@ -257,7 +266,7 @@ public class DetailsActivity extends AppCompatActivity {
         textFilmYili.setText(movie.getFilm_yil());
         textPuan.setText(movie.getFilm_puan());
         imageView.setOnClickListener(v -> {
-            Intent imageActivity = new Intent(DetailsActivity.this, ImageDetails.class);
+            Intent imageActivity = new Intent(DetailsActivity.this, ImageDetailsActivity.class);
             imageActivity.putExtra("image", movie.getFilm_image());
             Pair[] pair = new Pair[1];
             pair[0] = new Pair<View, String>(imageView, "cardPicture");
@@ -279,8 +288,8 @@ public class DetailsActivity extends AppCompatActivity {
 
         fab.setOnClickListener(v -> {
             if (firebaseAuth.getCurrentUser() != null) {
-                firebaseList=new ArrayList<>();
-                firebaseKeys=new ArrayList<>();
+                firebaseList = new ArrayList<>();
+                firebaseKeys = new ArrayList<>();
                 reference_favoriler.addChildEventListener(new ChildEventListener() {
                     @Override
                     public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
@@ -311,7 +320,7 @@ public class DetailsActivity extends AppCompatActivity {
                 reference_favoriler.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        if(firebaseList.contains(movie.getFilm_id())){
+                        if (firebaseList.contains(movie.getFilm_id())) {
                             reference_favoriler.child(firebaseKeys.get(firebaseList.indexOf(movie.getFilm_id()))).removeValue();
                             Snackbar.make(v, getResources().getString(R.string.favoricikti), Snackbar.LENGTH_LONG).show();
                             Drawable myFabSrc = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_favorite_beyaz, getTheme());
@@ -319,10 +328,9 @@ public class DetailsActivity extends AppCompatActivity {
                             Drawable willBeWhite = Objects.requireNonNull(myFabSrc.getConstantState()).newDrawable();
                             willBeWhite.mutate().setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
                             fab.setImageDrawable(willBeWhite);
-                        }
-                        else{
+                        } else {
                             String id = reference_favoriler.push().getKey();
-                            MovieFirebase movieFirebase=new MovieFirebase();
+                            MovieFirebase movieFirebase = new MovieFirebase();
                             movieFirebase.setFilm_id(movie.getFilm_id());
                             movieFirebase.setFilm_sinif(movie.getFilm_sinif());
                             movieFirebase.setFilm_tur(movie.getFilm_tur());
@@ -487,18 +495,21 @@ public class DetailsActivity extends AppCompatActivity {
                     Gson gson = new Gson();
                     APIMovieVideos dataVideos = gson.fromJson(jsonString, APIMovieVideos.class);
                     for (int i = 0; i < dataVideos.getResults().size(); i++) {
-                        final boolean[] control = {false};
                         if (dataVideos.getResults().get(i).getSite().toLowerCase().equals("youtube")
                                 && dataVideos.getResults().get(i).getType().toLowerCase().equals("trailer")) {
                             int finalI = i;
-                            youTubePlayerView.addYouTubePlayerListener(new AbstractYouTubePlayerListener() {
+                            youTubePlayerView.initialize(YoutubeApi.getApiKey(), new YouTubePlayer.OnInitializedListener() {
                                 @Override
-                                public void onReady(@NonNull YouTubePlayer youTubePlayer) {
-                                    youTubePlayer.cueVideo(dataVideos.getResults().get(finalI).getKey(), 0);
-                                    control[0] =true;
+                                public void onInitializationSuccess(YouTubePlayer.Provider provider, YouTubePlayer youTubePlayer, boolean b) {
+                                    youTubePlayer.cueVideo(dataVideos.getResults().get(finalI).getKey());
+                                }
+
+                                @Override
+                                public void onInitializationFailure(YouTubePlayer.Provider provider, YouTubeInitializationResult youTubeInitializationResult) {
+
                                 }
                             });
-                            if(control[0]) break;
+                            break;
                         }
                     }
                 }, Throwable::printStackTrace);
@@ -515,11 +526,9 @@ public class DetailsActivity extends AppCompatActivity {
                     getYonetmen(dataCast);
                     getOyuncu(dataCast);
                     diger.setOnClickListener(v -> {
-                        CustomDialogClass customDialogClass = new CustomDialogClass();
-                        Bundle bundle = new Bundle();
-                        bundle.putSerializable("cast",dataCast);
-                        customDialogClass.setArguments(bundle);
-                        customDialogClass.show(getSupportFragmentManager(), "Custom Dialog");
+                        Intent intent = new Intent(this, DetailsCastActivity.class);
+                        intent.putExtra("id", movie.getFilm_id());
+                        startActivity(intent);
                     });
                 }, Throwable::printStackTrace);
         requestQueue.add(request);
@@ -531,7 +540,7 @@ public class DetailsActivity extends AppCompatActivity {
                 response1 -> {
                     try {
                         oyuncuisim1.setText(response1.getString("name"));
-                        oyuncu1ID=response1.getString("id").toString();
+                        oyuncu1ID = response1.getString("id").toString();
                         Picasso.get().load("https://image.tmdb.org/t/p/original" + response1.getString("profile_path")).networkPolicy(NetworkPolicy.OFFLINE).into(oyuncuresim1, new Callback() {
                             @Override
                             public void onSuccess() {
@@ -556,15 +565,15 @@ public class DetailsActivity extends AppCompatActivity {
                         pairs[1] = new Pair<View, String>(oyuncuisim1, "text");
                         ActivityOptions activityOptions = ActivityOptions.makeSceneTransitionAnimation(DetailsActivity.this, pairs);
                         oyuncu1.putExtra("person_id", oyuncu1ID);
-                        oyuncu1.putExtra("secenek","oyuncu");
-                        startActivityForResult(oyuncu1,3, activityOptions.toBundle());
+                        oyuncu1.putExtra("secenek", "oyuncu");
+                        startActivityForResult(oyuncu1, 3, activityOptions.toBundle());
                     });
                     String url2 = "https://api.themoviedb.org/3/person/" + dataCast.getMovieCast().get(1).getId() + "?api_key=" + TMDBApi.getApiKey();
                     JsonObjectRequest request2 = new JsonObjectRequest(Request.Method.GET, url2, null,
                             response2 -> {
                                 try {
                                     oyuncuisim2.setText(response2.getString("name"));
-                                    oyuncu2ID=response2.getString("id").toString();
+                                    oyuncu2ID = response2.getString("id").toString();
                                     Picasso.get().load("https://image.tmdb.org/t/p/original" + response2.getString("profile_path")).networkPolicy(NetworkPolicy.OFFLINE).into(oyuncuresim2, new Callback() {
                                         @Override
                                         public void onSuccess() {
@@ -589,15 +598,15 @@ public class DetailsActivity extends AppCompatActivity {
                                     pairs[1] = new Pair<View, String>(oyuncuisim2, "text");
                                     ActivityOptions activityOptions = ActivityOptions.makeSceneTransitionAnimation(DetailsActivity.this, pairs);
                                     oyuncu2.putExtra("person_id", oyuncu2ID);
-                                    oyuncu2.putExtra("secenek","oyuncu");
-                                    startActivityForResult(oyuncu2,3, activityOptions.toBundle());
+                                    oyuncu2.putExtra("secenek", "oyuncu");
+                                    startActivityForResult(oyuncu2, 3, activityOptions.toBundle());
                                 });
                                 String url3 = "https://api.themoviedb.org/3/person/" + dataCast.getMovieCast().get(2).getId() + "?api_key=" + TMDBApi.getApiKey();
                                 JsonObjectRequest request3 = new JsonObjectRequest(Request.Method.GET, url3, null,
                                         response3 -> {
                                             try {
                                                 oyuncuisim3.setText(response3.getString("name"));
-                                                oyuncu3ID=response3.getString("id").toString();
+                                                oyuncu3ID = response3.getString("id").toString();
                                                 Picasso.get().load("https://image.tmdb.org/t/p/original" + response3.getString("profile_path")).networkPolicy(NetworkPolicy.OFFLINE).into(oyuncuresim3, new Callback() {
                                                     @Override
                                                     public void onSuccess() {
@@ -622,15 +631,15 @@ public class DetailsActivity extends AppCompatActivity {
                                                 pairs[1] = new Pair<View, String>(oyuncuisim3, "text");
                                                 ActivityOptions activityOptions = ActivityOptions.makeSceneTransitionAnimation(DetailsActivity.this, pairs);
                                                 oyuncu3.putExtra("person_id", oyuncu3ID);
-                                                oyuncu3.putExtra("secenek","oyuncu");
-                                                startActivityForResult(oyuncu3,3, activityOptions.toBundle());
+                                                oyuncu3.putExtra("secenek", "oyuncu");
+                                                startActivityForResult(oyuncu3, 3, activityOptions.toBundle());
                                             });
                                             String url4 = "https://api.themoviedb.org/3/person/" + dataCast.getMovieCast().get(3).getId() + "?api_key=" + TMDBApi.getApiKey();
                                             JsonObjectRequest request4 = new JsonObjectRequest(Request.Method.GET, url4, null,
                                                     response4 -> {
                                                         try {
                                                             oyuncuisim4.setText(response4.getString("name"));
-                                                            oyuncu4ID=response4.getString("id").toString();
+                                                            oyuncu4ID = response4.getString("id").toString();
                                                             Picasso.get().load("https://image.tmdb.org/t/p/original" + response4.getString("profile_path")).networkPolicy(NetworkPolicy.OFFLINE).into(oyuncuresim4, new Callback() {
                                                                 @Override
                                                                 public void onSuccess() {
@@ -655,15 +664,15 @@ public class DetailsActivity extends AppCompatActivity {
                                                             pairs[1] = new Pair<View, String>(oyuncuisim4, "text");
                                                             ActivityOptions activityOptions = ActivityOptions.makeSceneTransitionAnimation(DetailsActivity.this, pairs);
                                                             oyuncu4.putExtra("person_id", oyuncu4ID);
-                                                            oyuncu4.putExtra("secenek","oyuncu");
-                                                            startActivityForResult(oyuncu4, 3,activityOptions.toBundle());
+                                                            oyuncu4.putExtra("secenek", "oyuncu");
+                                                            startActivityForResult(oyuncu4, 3, activityOptions.toBundle());
                                                         });
                                                         String url5 = "https://api.themoviedb.org/3/person/" + dataCast.getMovieCast().get(4).getId() + "?api_key=" + TMDBApi.getApiKey();
                                                         JsonObjectRequest request5 = new JsonObjectRequest(Request.Method.GET, url5, null,
                                                                 response5 -> {
                                                                     try {
                                                                         oyuncuisim5.setText(response5.getString("name"));
-                                                                        oyuncu5ID=response5.getString("id").toString();
+                                                                        oyuncu5ID = response5.getString("id").toString();
                                                                         Picasso.get().load("https://image.tmdb.org/t/p/original" + response5.getString("profile_path")).networkPolicy(NetworkPolicy.OFFLINE).into(oyuncuresim5, new Callback() {
                                                                             @Override
                                                                             public void onSuccess() {
@@ -688,15 +697,15 @@ public class DetailsActivity extends AppCompatActivity {
                                                                         pairs[1] = new Pair<View, String>(oyuncuisim5, "text");
                                                                         ActivityOptions activityOptions = ActivityOptions.makeSceneTransitionAnimation(DetailsActivity.this, pairs);
                                                                         oyuncu5.putExtra("person_id", oyuncu5ID);
-                                                                        oyuncu5.putExtra("secenek","oyuncu");
-                                                                        startActivityForResult(oyuncu5,3, activityOptions.toBundle());
+                                                                        oyuncu5.putExtra("secenek", "oyuncu");
+                                                                        startActivityForResult(oyuncu5, 3, activityOptions.toBundle());
                                                                     });
                                                                     String url6 = "https://api.themoviedb.org/3/person/" + dataCast.getMovieCast().get(5).getId() + "?api_key=" + TMDBApi.getApiKey();
                                                                     JsonObjectRequest request6 = new JsonObjectRequest(Request.Method.GET, url6, null,
                                                                             response6 -> {
                                                                                 try {
                                                                                     oyuncuisim6.setText(response6.getString("name"));
-                                                                                    oyuncu6ID=response6.getString("id").toString();
+                                                                                    oyuncu6ID = response6.getString("id").toString();
                                                                                     Picasso.get().load("https://image.tmdb.org/t/p/original" + response6.getString("profile_path")).networkPolicy(NetworkPolicy.OFFLINE).into(oyuncuresim6, new Callback() {
                                                                                         @Override
                                                                                         public void onSuccess() {
@@ -721,8 +730,8 @@ public class DetailsActivity extends AppCompatActivity {
                                                                                     pairs[1] = new Pair<View, String>(oyuncuisim6, "text");
                                                                                     ActivityOptions activityOptions = ActivityOptions.makeSceneTransitionAnimation(DetailsActivity.this, pairs);
                                                                                     oyuncu6.putExtra("person_id", oyuncu6ID);
-                                                                                    oyuncu6.putExtra("secenek","oyuncu");
-                                                                                    startActivityForResult(oyuncu6,3, activityOptions.toBundle());
+                                                                                    oyuncu6.putExtra("secenek", "oyuncu");
+                                                                                    startActivityForResult(oyuncu6, 3, activityOptions.toBundle());
                                                                                 });
                                                                             }, Throwable::printStackTrace);
                                                                     requestQueue.add(request6);
@@ -743,7 +752,7 @@ public class DetailsActivity extends AppCompatActivity {
         for (int i = 0; i < dataCast.getMovieCrew().size(); i++) {
             if (dataCast.getMovieCrew().get(i).getJob().equals("Director")) {
                 id = dataCast.getMovieCrew().get(i).getId().toString();
-                yonetmenID=id;
+                yonetmenID = id;
                 textYonetmen.setText(dataCast.getMovieCrew().get(i).getName());
             }
         }
@@ -772,8 +781,8 @@ public class DetailsActivity extends AppCompatActivity {
                             pairs[1] = new Pair<View, String>(textYonetmen, "text");
                             ActivityOptions activityOptions = ActivityOptions.makeSceneTransitionAnimation(DetailsActivity.this, pairs);
                             yonetmen.putExtra("person_id", yonetmenID);
-                            yonetmen.putExtra("secenek","yonetmen");
-                            startActivityForResult(yonetmen, 3,activityOptions.toBundle());
+                            yonetmen.putExtra("secenek", "yonetmen");
+                            startActivityForResult(yonetmen, 3, activityOptions.toBundle());
                         });
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -837,7 +846,7 @@ public class DetailsActivity extends AppCompatActivity {
             reference_favoriler.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    if(firebaseList.contains(movie.getFilm_id())){
+                    if (firebaseList.contains(movie.getFilm_id())) {
                         Drawable favFabFirebase = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_favorite_ekli, getTheme());
                         Drawable whiteFavFirebase = Objects.requireNonNull(favFabFirebase.getConstantState()).newDrawable();
                         whiteFavFirebase.mutate().setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_ATOP);

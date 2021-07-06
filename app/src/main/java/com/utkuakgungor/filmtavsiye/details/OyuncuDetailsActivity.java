@@ -3,7 +3,6 @@ package com.utkuakgungor.filmtavsiye.details;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -11,7 +10,6 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
@@ -26,7 +24,6 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 import com.ms.square.android.expandabletextview.ExpandableTextView;
 import com.squareup.picasso.Callback;
@@ -36,7 +33,6 @@ import com.utkuakgungor.filmtavsiye.R;
 import com.utkuakgungor.filmtavsiye.models.APIPersonMovies;
 import com.utkuakgungor.filmtavsiye.models.MovieFirebase;
 import com.utkuakgungor.filmtavsiye.utils.FirebaseAdapter;
-import com.utkuakgungor.filmtavsiye.models.Movie;
 import com.utkuakgungor.filmtavsiye.utils.TMDBApi;
 
 import org.json.JSONException;
@@ -49,7 +45,16 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class OyuncuDetailsActivity extends AppCompatActivity {
 
-    private String secenek, person_id, day, month, year, dateRespond, urlTwitter = "https://twitter.com/", urlInstagram = "https://www.instagram.com/", urlImdb = "https://www.imdb.com/name/", urlFacebook = "https://www.facebook.com/";
+    private String secenek;
+    private String person_id;
+    private String day;
+    private String month;
+    private String year;
+    private String dateRespond;
+    private final String urlTwitter = "https://twitter.com/";
+    private final String urlInstagram = "https://www.instagram.com/";
+    private final String urlImdb = "https://www.imdb.com/name/";
+    private final String urlFacebook = "https://www.facebook.com/";
     private DatabaseReference referenceFilmler, referenceFavoriler;
     private TextView txt_oyuncutarih, txt_oyuncuadi, txt_oyuncusehir, txt_oyuncusite;
     private StringBuilder date;
@@ -60,24 +65,16 @@ public class OyuncuDetailsActivity extends AppCompatActivity {
     private ExpandableTextView expandableTextView;
     private RequestQueue requestQueue;
     private LinearLayout linearLayout;
-    private FirebaseAuth firebaseAuth;
-
-    public boolean onOptionsItemSelected(MenuItem item) {
-        onBackPressed();
-        return super.onOptionsItemSelected(item);
-    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        firebaseAuth = FirebaseAuth.getInstance();
+        FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
         if (firebaseAuth.getCurrentUser() != null) {
-            referenceFavoriler = FirebaseDatabase.getInstance().getReference("Favoriler").child(Objects.requireNonNull(firebaseAuth.getCurrentUser().getEmail().replace(".", "").replace("#", "").replace("$", "").replace("[", "").replace("]", "")));
+            referenceFavoriler = FirebaseDatabase.getInstance().getReference("Favoriler").child(Objects.requireNonNull(Objects.requireNonNull(firebaseAuth.getCurrentUser().getEmail()).replace(".", "").replace("#", "").replace("$", "").replace("[", "").replace("]", "")));
         }
         setContentView(R.layout.activity_oyuncudetails);
         getIncomingIntent();
-        ActionBar actionBar = getSupportActionBar();
-        Objects.requireNonNull(actionBar).setDisplayHomeAsUpEnabled(true);
         expandableTextView = findViewById(R.id.detayoyuncuextext);
         txt_oyuncuadi = findViewById(R.id.detayoyuncuad);
         image_oyuncu = findViewById(R.id.detayoyuncuimage);

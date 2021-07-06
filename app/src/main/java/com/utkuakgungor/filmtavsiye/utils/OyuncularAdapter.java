@@ -37,7 +37,7 @@ public class OyuncularAdapter extends RecyclerView.Adapter<OyuncularAdapter.View
     private List<Oyuncu> list;
     private Pair[] pairs;
 
-    OyuncularAdapter(Context context, List<Oyuncu> list) {
+    public OyuncularAdapter(Context context, List<Oyuncu> list) {
         this.list = new ArrayList<>();
         this.list = list;
     }

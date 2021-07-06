@@ -195,12 +195,12 @@
                     android:layout_marginStart="15dp"
                     android:layout_below="@+id/detayyonetmenRelative"
                     android:layout_toEndOf="@+id/detayTurbaslik"/>
-                <com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
-                    android:id="@+id/detay_youtube_player_view"
+                <view
                     android:layout_width="wrap_content"
-                    app:showFullScreenButton="false"
                     android:layout_height="wrap_content"
+                    android:id="@+id/detay_youtube_player_view"
                     android:layout_marginTop="14dp"
+                    class="com.google.android.youtube.player.YouTubePlayerView"
                     android:layout_below="@id/detaytur"/>
                 <TextView
                     android:layout_width="wrap_content"
